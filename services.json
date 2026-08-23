@@ -1,0 +1,52 @@
+{
+  "$comment": "The service manifest. One row per Construct service Placard knows about — embedded into the placard binary, rendered on the front page, and the index /api/services serves. `raster_from_svg: true` means the mark PNGs are generated from <slug>/<slug>-mark.svg by `placard gen` (edit the SVG, never the PNGs). `color` is only present where BRAND.md establishes a rule — leave it absent rather than inventing one. Notes carry the 2026-08-15 launcher audit that prompted IDEA-22.",
+  "services": [
+    {
+      "slug": "lyceum",
+      "name": "Lyceum",
+      "note": "The only mark that rendered in the launcher pre-Placard. PNG seeded from the service repo, same image for both surfaces.",
+      "legacy_source": "lyceum@main/brand/lyceum-logo.png"
+    },
+    {
+      "slug": "argosy",
+      "name": "Argosy",
+      "note": "The old jsDelivr path rotted when the asset was renamed in its own repo — the stored logo_url 404d and the launcher silently fell back to initials. The canonical copies live here now.",
+      "legacy_source": "argosy@main/assets/argosy_white_transparent.png (was argosy_logo_only_light_trans.png)"
+    },
+    {
+      "slug": "switchyard",
+      "name": "Switchyard",
+      "color": "#e2623d",
+      "raster_from_svg": true,
+      "note": "Repo is private — jsDelivr could not serve it at any path, ever. The mark's public home is here.",
+      "legacy_source": "switchyard@main/client/src/assets/sy_mark.svg (private)"
+    },
+    {
+      "slug": "wiki",
+      "name": "Wiki",
+      "note": "No logo_url set on the Access application; renders as two grey initials.",
+      "legacy_source": "none"
+    },
+    {
+      "slug": "app-launcher",
+      "name": "App Launcher",
+      "note": "No logo_url set. Acceptable — it is the surface, not a service.",
+      "legacy_source": "none"
+    },
+    {
+      "slug": "amber",
+      "name": "Amber",
+      "color": "#d99b2b",
+      "note": "No mark yet. Gold #d99b2b is reserved as Amber's reference colour — see BRAND.md.",
+      "legacy_source": "none"
+    },
+    {
+      "slug": "placard",
+      "name": "Placard",
+      "color": "#b8ff2e",
+      "raster_from_svg": true,
+      "note": "This service: the front page you are reading, and the mirror of every mark in this repo.",
+      "legacy_source": "none — born here"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+name: release-please
+
+# Automated releases. Release Please watches conventional commits on main and
+# maintains a release PR (version bump + CHANGELOG); merging it cuts the tag +
+# GitHub Release in THIS run, which then calls publish.yml for the semver image.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      # For a root component (path `.`) v4 exposes UN-prefixed outputs
+      # (`releases_created`, `tag_name`); the `<path>--` prefix is only for
+      # non-root monorepo paths (argosy learned this the empty-output way).
+      releases_created: ${{ steps.rp.outputs.releases_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: rp
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  # release-please cuts the v* tag with GITHUB_TOKEN, which can't fire a
+  # downstream `on: push: tags` run — GitHub creates no workflow runs from
+  # events that token authored. So the semver image is published from HERE, in
+  # the same (real-user push-to-main) run that cut the release (SERV-125).
+  #
+  # `!= 'false'` rather than `== 'true'`, deliberately: an output that reads
+  # back EMPTY (renamed, wrongly prefixed) would silently skip under `==
+  # 'true'` on every push — the same silent-skip shape as the bug being
+  # avoided. This way a broken output runs the job and fails it loudly.
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.releases_created != 'false'
+    uses: ./.github/workflows/publish.yml
+    with:
+      tag: ${{ needs.release-please.outputs.tag_name }}
+      from_release: true
+    permissions:
+      contents: read
+      packages: write

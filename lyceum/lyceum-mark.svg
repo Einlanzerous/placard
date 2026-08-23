@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- The Lyceum brand mark: a brass rounded square rotated 45° into a diamond
+       outline (mirrors .lib__brand-mark in LibraryView.vue). The stroke follows
+       the UA colour scheme, matching the app's own light/dark brass. -->
+  <style>
+    .mark { stroke: #9c6f2e; }
+    @media (prefers-color-scheme: dark) { .mark { stroke: #c99a4e; } }
+  </style>
+  <rect class="mark" x="7" y="7" width="18" height="18" rx="4"
+        fill="none" stroke-width="3" transform="rotate(45 16 16)" />
+</svg>

@@ -1,0 +1,149 @@
+name: publish
+
+# Builds the production image (deploy/Dockerfile) and pushes it to GHCR.
+# construct-server pins this image in versions.env.
+#
+# FOUR ENTRYPOINTS (argosy's SERV-125 shape — see that repo's publish.yml for
+# the full war story):
+#
+#   push to main      :latest and sha-<short>. No semver — main is not a release.
+#   workflow_call     the semver tags, called by release-please.yml in the same
+#                     run that cut the release. This is the real release path:
+#                     `on: push: tags` never fires for bot-authored tags.
+#   workflow_dispatch pass a `tag` to back-publish that release's image; empty
+#                     rebuilds the dispatched branch. (An input, not a tag ref:
+#                     dispatching an old tag would run the workflow file as it
+#                     existed at that tag.)
+#   push of a v* tag  a tag pushed by a HUMAN, which does create events.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v0.1.0)"
+        required: true
+        type: string
+      from_release:
+        description: "Set by release-please.yml. Makes an empty tag a hard failure rather than a silent no-semver build."
+        required: false
+        default: false
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v0.1.0). Empty rebuilds the dispatched branch."
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve the version and the commit to build
+        # SEMVER empty signals a :latest + sha-<short> build with no semver
+        # tags. BUILD_REF is what gets checked out, so a back-publish builds
+        # the tagged commit and not main's tip. Inputs reach the shell through
+        # env, not inline ${{ }} interpolation.
+        env:
+          FROM_RELEASE: ${{ inputs.from_release }}
+          CALLED_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # From the release run, an empty tag is an ERROR, not a fallback —
+          # a broken tag_name output must not publish an unversioned image
+          # and go green (the exact silent failure this shape exists to kill).
+          if [ "${FROM_RELEASE:-false}" = "true" ] && [ -z "${CALLED_TAG:-}" ]; then
+            echo "Error: called from the release run, but the tag is empty."
+            exit 1
+          fi
+
+          if [ -n "${CALLED_TAG:-}" ]; then
+            version="${CALLED_TAG#v}"; build_ref="$CALLED_TAG"
+            source="tag input ($CALLED_TAG)"
+          elif [ "$REF_TYPE" = tag ]; then
+            version="${REF_NAME#v}"; build_ref="$SHA"
+            source="pushed tag $REF_NAME"
+          else
+            version=""; build_ref="$SHA"
+            source="branch build — no semver tags"
+          fi
+
+          # A malformed version must not reach the tag list: metadata-action
+          # skips values it cannot parse with only a warning, and the build
+          # would go green having published no semver tag.
+          if [ -n "$version" ] && ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Error: '$version' is not a semver, so no semver image tag would be published."
+            exit 1
+          fi
+
+          {
+            echo "SEMVER=$version"
+            echo "BUILD_REF=$build_ref"
+          } >> "$GITHUB_ENV"
+          echo "Version source: $source"
+          echo "Semver tags: ${version:-<none>}"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BUILD_REF }}
+
+      - name: Record the commit actually built
+        # On a back-publish `github.sha` is main's tip, NOT the tag being
+        # built; metadata-action would stamp the revision label with a commit
+        # the image does not contain. construct-server compares that label
+        # rather than the digest (SERV-88), so it has to be honest.
+        run: echo "REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/einlanzerous/placard
+          # latest=false is load-bearing: the default `auto` emits :latest by
+          # itself for any non-prerelease semver, so a back-publish of an old
+          # release would walk :latest backwards silently. The type=raw line
+          # below is the sole policy for that tag. The two halves are mutually
+          # exclusive: a release build publishes the semver tags and nothing
+          # else; an ordinary main push publishes :latest + sha-<short> and
+          # nothing else — both fire on a release merge and never race the
+          # same tag.
+          flavor: latest=false
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && env.SEMVER == '' }}
+            type=sha,format=short,enable=${{ env.SEMVER == '' }}
+            type=semver,pattern={{version}},value=${{ env.SEMVER }},enable=${{ env.SEMVER != '' }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ env.SEMVER }},enable=${{ env.SEMVER != '' }}
+          labels: |
+            org.opencontainers.image.revision=${{ env.REVISION }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Read from the values THIS workflow resolved, never re-derived from
+          # the github context: on the workflow_call release path ref_type is
+          # `branch` (called workflows inherit the CALLER's context), and on a
+          # back-publish github.sha is the wrong commit — both argosy findings.
+          build-args: |
+            VERSION=${{ env.SEMVER }}
+            GIT_SHA=${{ env.REVISION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

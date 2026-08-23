@@ -1,0 +1,64 @@
+name: backend
+
+# Go build + test. DB-backed store tests skip unless PLACARD_TEST_DATABASE_URL
+# is set, so a Postgres 16 service container provides one. A paths-filter keeps
+# the expensive Go steps off asset-only pushes — most commits to a marks repo
+# touch no Go at all — while still reporting a pass.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: placard_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PLACARD_TEST_DATABASE_URL: postgres://postgres:test@localhost:5432/placard_test?sslmode=disable
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            go:
+              - "**.go"
+              - "go.mod"
+              - "go.sum"
+
+      - uses: actions/setup-go@v5
+        if: steps.changes.outputs.go == 'true'
+        with:
+          go-version-file: go.mod
+
+      - name: go vet
+        if: steps.changes.outputs.go == 'true'
+        run: go vet ./...
+
+      - name: go test
+        if: steps.changes.outputs.go == 'true'
+        run: go test ./...
