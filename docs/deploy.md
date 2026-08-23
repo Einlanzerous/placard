@@ -36,11 +36,6 @@ docker exec postgres psql -U postgres -c "CREATE DATABASE placard OWNER placard_
 docker exec postgres psql -U postgres -c "CREATE DATABASE placard_test OWNER placard_user;"
 ```
 
-`PLACARD_DB_PASSWORD` was appended to the box `.env`. **It must also be added
-to the `PROD_ENV_FILE` GitHub Environment secret** — the deploy re-renders
-`.env` from that secret, and a password that lives only on the box is one
-deploy away from a 28P01 (the purser story, three times).
-
 `db/init-db.sh` carries the same `ensure_db` lines for a from-scratch
 Postgres, so this step exists only because the cluster predates placard.
 
@@ -48,19 +43,33 @@ Postgres, so this step exists only because the cluster predates placard.
 
 The construct-server PR adds: the `placard` compose service, the postgres
 env line, the init-db entries, the ungated Traefik router, the
-`check-edge-auth.sh` EXEMPT entry, `PLACARD_TAG` in `versions.env`, and the
-`.env.example` documentation. Merging it deploys (deploy.yml watches those
-paths).
+`check-edge-auth.sh` EXEMPT entry, `PLACARD_TAG` in `versions.env`, the
+promote.yml dropdown entry, and the `.env.example` documentation. Merging it
+deploys (deploy.yml watches those paths).
 
-### 3. Secrets
+### 3. Secrets (done 2026-08-23, via signet)
 
-Into `PROD_ENV_FILE` (GitHub → construct-server → Settings → Environments →
-home-server):
+Secrets are vaulted in **signet**, which renders them into the
+`PROD_ENV_FILE` environment secret the deploy reads — never edit that secret
+by hand. Exactly as performed:
 
+```sh
+# the password the live placard_user role already has, from step 1
+signet set --project construct-server --name PLACARD_DB_PASSWORD    # value on stdin
+signet generate --project construct-server --name PLACARD_UPLOAD_TOKEN
+signet target add-key --project construct-server --gh-secret PROD_ENV_FILE \
+    --name PLACARD_DB_PASSWORD,PLACARD_UPLOAD_TOKEN
+signet target add-key --project construct-server --path /home/magos/construct-server/.env \
+    --name PLACARD_DB_PASSWORD,PLACARD_UPLOAD_TOKEN
+signet target add-key --project construct-server --path /opt/construct-server/.env \
+    --name PLACARD_DB_PASSWORD,PLACARD_UPLOAD_TOKEN
+signet sync        # seals + pushes the PROD_ENV_FILE render
 ```
-PLACARD_DB_PASSWORD=<the value from the box .env>
-PLACARD_UPLOAD_TOKEN=<mint one: openssl rand -hex 24>
-```
+
+The deploy-root `/opt/construct-server/.env` picks the keys up on the next
+deploy (`render-env.sh` merges `PROD_ENV_FILE` + `versions.env`); do **not**
+`signet render` it to shortcut that — the vault's copies of the `*_TAG` pins
+lag versions.env-driven promotes, and a render would roll live tags back.
 
 `PLACARD_UPLOAD_TOKEN` may be left unset — uploads are then disabled and
 everything else works.
