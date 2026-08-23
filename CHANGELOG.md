@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/Einlanzerous/placard/compare/v0.2.1...v0.2.2) (2026-08-23)
+
+
+### Bug Fixes
+
+* stop the detail pane bouncing between services (PCAD-12) ([9d80333](https://github.com/Einlanzerous/placard/commit/9d80333bf98b3f3df6be03466cdea532b49a3f0d))
+
 ## [0.2.1](https://github.com/Einlanzerous/placard/compare/v0.2.0...v0.2.1) (2026-08-23)
 
 
