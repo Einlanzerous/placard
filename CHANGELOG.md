@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/Einlanzerous/placard/compare/v0.2.0...v0.2.1) (2026-08-23)
+
+
+### Bug Fixes
+
+* argosy marks are the ship glyph, not the wordmark lockup (PCAD-11) ([fe90055](https://github.com/Einlanzerous/placard/commit/fe90055322cee554d85173901ede626a9bb4c733))
+
 ## [0.2.0](https://github.com/Einlanzerous/placard/compare/v0.1.0...v0.2.0) (2026-08-23)
 
 
