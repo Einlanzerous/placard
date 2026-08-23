@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Einlanzerous/placard/compare/v0.2.2...v0.3.0) (2026-08-23)
+
+
+### Features
+
+* edge self-check — placard notices its own Access gate (PCAD-10) ([abdf5a9](https://github.com/Einlanzerous/placard/commit/abdf5a990bda842c3f20bd9a4dadc411d2fbd69e))
+
 ## [0.2.2](https://github.com/Einlanzerous/placard/compare/v0.2.1...v0.2.2) (2026-08-23)
 
 
