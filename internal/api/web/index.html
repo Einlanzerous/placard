@@ -58,7 +58,7 @@
   .dot { width:8px; height:8px; border-radius:50%; }
 
   main { overflow:auto; min-height:0; padding:26px 30px 44px; }
-  .detail { max-width:860px; display:flex; flex-direction:column; gap:26px; }
+  .detail { max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:26px; }
   .detail-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
   .detail-title { font-size:30px; font-weight:700; letter-spacing:-0.01em; }
   .detail-note { font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8b9298; max-width:520px; line-height:1.5; }
@@ -203,6 +203,10 @@
     return fetch('/api/services').then(function (r) { return r.json(); }).then(function (data) {
       state.data = data;
       var slugs = data.services.map(function (s) { return s.slug; });
+      var fromHash = window.location.hash.replace(/^#/, '');
+      if (!state.selected && slugs.indexOf(fromHash) >= 0) {
+        state.selected = fromHash;
+      }
       if (!state.selected || slugs.indexOf(state.selected) < 0) {
         state.selected = slugs.indexOf('argosy') >= 0 ? 'argosy' : slugs[0];
       }
@@ -248,6 +252,7 @@
       row.addEventListener('click', function () {
         state.selected = svc.slug;
         state.copied = false;
+        if (history.replaceState) history.replaceState(null, '', '#' + svc.slug);
         render();
       });
       list.appendChild(row);
