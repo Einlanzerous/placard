@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Placard</title>
+<link rel="icon" href="/placard/placard-mark-dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Implemented from the Claude Design project (Placard.dc.html). Palette in BRAND.md. */
+  html, body { margin:0; padding:0; background:#0d0e0f; }
+  * { box-sizing:border-box; }
+  body { color:#e6e8ea; font-family:Archivo, Helvetica, sans-serif; }
+  a { color:#b8ff2e; text-decoration:none; }
+  a:hover { color:#d6ff7a; }
+  ::selection { background:#b8ff2e; color:#0d0e0f; }
+  .mono { font-family:'IBM Plex Mono', monospace; }
+
+  .app { height:100vh; overflow:hidden; display:grid; grid-template-rows:auto minmax(0,1fr); }
+
+  header { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 28px;
+           border-bottom:1px solid #24282c; background:linear-gradient(180deg,#15181a,#101213); }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .brand img { width:34px; height:34px; border-radius:7px; display:block; }
+  .brand .title { font-size:19px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; }
+  .brand .tag { font-family:'IBM Plex Mono', monospace; font-size:11px; color:#7d848a; letter-spacing:0.04em; }
+  .header-chips { display:flex; align-items:center; gap:10px; }
+  .repo-chip { font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:#9aa1a7; background:#191c1f;
+               border:1px solid #2a2e32; border-radius:6px; padding:7px 11px; }
+  .public-chip { font-family:'IBM Plex Mono', monospace; font-size:11px; color:#0d0e0f; background:#b8ff2e;
+                 border-radius:6px; padding:7px 11px; font-weight:600; letter-spacing:0.06em; }
+
+  .layout { display:grid; grid-template-columns:340px 1fr; min-height:0; }
+
+  aside { border-right:1px solid #24282c; background:#111314; display:flex; flex-direction:column; min-height:0; }
+  .aside-head { display:flex; align-items:baseline; justify-content:space-between; padding:16px 20px 10px;
+                font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.12em;
+                text-transform:uppercase; color:#6f767c; }
+  .svc-list { overflow:auto; padding:0 10px 16px; display:flex; flex-direction:column; gap:4px; }
+  .svc-row { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:12px; padding:10px 12px;
+             border-radius:8px; border:1px solid transparent; cursor:pointer; background:transparent; text-align:left;
+             color:inherit; font:inherit; }
+  .svc-row:hover { background:#1b1f22; }
+  .svc-row.sel { background:#1e2225; border-color:#3a4045; }
+  .svc-tile { width:44px; height:44px; border-radius:9px; background:linear-gradient(150deg,#33383d,#1c2023);
+              border:1px solid #33383d; display:grid; place-items:center; overflow:hidden;
+              box-shadow:inset 0 1px 0 rgba(255,255,255,0.09); }
+  .svc-tile img { width:30px; height:30px; object-fit:contain; }
+  .initials { width:100%; height:100%; display:grid; place-items:center;
+              background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.07) 0 5px, rgba(255,255,255,0) 5px 10px);
+              font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600; color:#7f878d; }
+  .svc-meta { display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .svc-name { font-size:14.5px; font-weight:600; letter-spacing:0.01em; }
+  .svc-slug { font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:#767d83;
+              white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dot { width:8px; height:8px; border-radius:50%; }
+
+  main { overflow:auto; min-height:0; padding:26px 30px 44px; }
+  .detail { max-width:860px; display:flex; flex-direction:column; gap:26px; }
+  .detail-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+  .detail-title { font-size:30px; font-weight:700; letter-spacing:-0.01em; }
+  .detail-note { font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8b9298; max-width:520px; line-height:1.5; }
+  .status-chip { display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+                 letter-spacing:0.1em; text-transform:uppercase; padding:7px 11px; border-radius:6px;
+                 border:1px solid #2d3236; background:#181b1d; white-space:nowrap; }
+  .status-chip .dot { width:7px; height:7px; }
+
+  section.panel { border:1px solid #24282c; border-radius:12px; background:#131517; overflow:hidden; }
+  .panel-head { padding:12px 16px; border-bottom:1px solid #22262a; font-family:'IBM Plex Mono', monospace;
+                font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:#6f767c;
+                display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .panel-head .sub { text-transform:none; letter-spacing:0; color:#5f666b; }
+
+  .url-row { display:flex; align-items:center; gap:14px; padding:16px; }
+  .url-text { flex:1; font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:#cdd3d8; line-height:1.6; word-break:break-all; }
+  .copy-btn { font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+              color:#0d0e0f; background:#b8ff2e; border:0; border-radius:6px; padding:9px 14px; cursor:pointer;
+              font-weight:600; white-space:nowrap; }
+  .copy-btn:hover { background:#d6ff7a; }
+
+  .file-row { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:16px; padding:13px 16px;
+              border-top:1px solid #1d2124; }
+  .file-name { font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:#dfe3e6; word-break:break-all; }
+  .file-role { font-family:'IBM Plex Mono', monospace; font-size:11px; color:#6f767c; }
+  .chip { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.09em; text-transform:uppercase;
+          padding:5px 9px; border-radius:5px; white-space:nowrap; }
+  .chip.ok      { background:#1f2612; color:#b8ff2e; }
+  .chip.bad     { background:#241a1f; color:#ff3d8b; }
+  .chip.neutral { background:#1c1f22; color:#8b9298; }
+
+  .rendered { display:flex; flex-wrap:wrap; gap:14px; padding:18px 16px; }
+  .swatch { display:flex; flex-direction:column; gap:10px; align-items:center; padding:16px; border-radius:10px; min-width:132px; }
+  .swatch .label { font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.09em; text-transform:uppercase; }
+  .tile { position:relative; width:64px; height:64px; border-radius:13px; display:grid; place-items:center; overflow:hidden; }
+  .tile img { width:42px; height:42px; object-fit:contain; }
+  .tile .tile-initials { font-family:'IBM Plex Mono', monospace; font-size:16px; font-weight:600; color:#7f878d; }
+  .on-light { background:#d9dcdf; }
+  .on-light .tile { background:#ffffff; border:1px solid rgba(0,0,0,0.09); box-shadow:0 1px 3px rgba(0,0,0,0.16); }
+  .on-light .label { color:#5c6268; }
+  .on-light .tile-initials { color:#8a9096; }
+  .on-dark { background:#1a1d20; border:1px solid #262b2f; }
+  .on-dark .tile { background:linear-gradient(150deg,#30353a,#1d2124); border:1px solid #3a4045; }
+  .on-dark .label { color:#7d848a; }
+  .dev-swatch { background:#1a1d20; border:1px solid #3d3a21; }
+  .dev-swatch .tile-wrap { position:relative; width:64px; height:64px; }
+  .dev-swatch .tile { position:absolute; inset:0; background:linear-gradient(150deg,#30353a,#1d2124); border:1px solid #3a4045; }
+  .dev-swatch .tile img { width:56px; height:56px; }
+  .dev-swatch .label { color:#c9b53f; }
+  .nolabel-swatch { background:#1a1d20; border:1px dashed #33383d; }
+  .nolabel-swatch .tile { border-radius:13px; background:#26292c; }
+  .nolabel-swatch .tile-initials { font-size:18px; color:#6c7278; }
+  .nolabel-swatch .label { color:#7d848a; }
+
+  .upload { border:1px dashed #34393e; border-radius:12px; background:#121415; padding:26px; display:flex;
+            align-items:center; justify-content:space-between; gap:20px; cursor:pointer; }
+  .upload:hover { background:#16191b; }
+  .upload.dragging { border-color:#b8ff2e; }
+  .upload.disabled { cursor:default; opacity:0.8; }
+  .upload-title { font-size:15px; font-weight:600; }
+  .upload-hint { font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:#7d848a; line-height:1.5; margin-top:6px; }
+  .choose-btn { font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.07em; text-transform:uppercase;
+                color:#e6e8ea; border:1px solid #3d4348; background:linear-gradient(180deg,#2b3034,#1f2326);
+                border-radius:6px; padding:10px 15px; white-space:nowrap; }
+  .staged-list { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+  .staged-item { font-family:'IBM Plex Mono', monospace; font-size:11px; color:#9aa1a7; display:flex; gap:10px; align-items:center; }
+
+  .source-line { display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono', monospace; font-size:11px;
+                 color:#666d73; line-height:1.6; }
+  .source-line .glyph { color:#ff3d8b; }
+
+  @media (max-width: 900px) {
+    .app { height:auto; overflow:visible; }
+    .layout { grid-template-columns:1fr; }
+    aside { border-right:0; border-bottom:1px solid #24282c; max-height:280px; }
+    header { flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <img src="/placard/placard-mark-dark.png" alt="">
+      <div>
+        <div class="title">Placard</div>
+        <div class="tag">service marks at a predictable path</div>
+      </div>
+    </div>
+    <div class="header-chips">
+      <a class="repo-chip" id="repo-chip" href="#" target="_blank" rel="noopener"></a>
+      <div class="public-chip">PUBLIC</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="aside-head"><span>Services</span><span id="count-label"></span></div>
+      <div class="svc-list" id="svc-list"></div>
+    </aside>
+    <main>
+      <div class="detail" id="detail"></div>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STATUS = {
+    in_repo:     { label: 'in repo',     color: '#b8ff2e' },
+    path_rotted: { label: 'path rotted', color: '#ff3d8b' },
+    unverified:  { label: 'unverified',  color: '#8b9298' },
+    unset:       { label: 'unset',       color: '#8b9298' }
+  };
+
+  var state = { data: null, selected: null, copied: false, dragging: false };
+
+  function initials(name) {
+    var p = name.trim().split(/[\s-]+/);
+    return (p.length > 1 ? p[0][0] + p[1][0] : name.slice(0, 2)).toUpperCase();
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function el(html) {
+    var t = document.createElement('template');
+    t.innerHTML = html.trim();
+    return t.content.firstChild;
+  }
+  function fileByName(svc, suffix) {
+    for (var i = 0; i < svc.files.length; i++) {
+      if (svc.files[i].name === svc.slug + suffix) return svc.files[i];
+    }
+    return null;
+  }
+
+  function load() {
+    return fetch('/api/services').then(function (r) { return r.json(); }).then(function (data) {
+      state.data = data;
+      var slugs = data.services.map(function (s) { return s.slug; });
+      if (!state.selected || slugs.indexOf(state.selected) < 0) {
+        state.selected = slugs.indexOf('argosy') >= 0 ? 'argosy' : slugs[0];
+      }
+      render();
+    });
+  }
+
+  function selected() {
+    return state.data.services.find(function (s) { return s.slug === state.selected; });
+  }
+
+  function render() {
+    var data = state.data;
+    var repoChip = document.getElementById('repo-chip');
+    repoChip.textContent = 'github.com/' + data.repo;
+    repoChip.href = 'https://github.com/' + data.repo;
+    document.getElementById('count-label').textContent =
+      String(data.services.length).padStart(2, '0');
+
+    renderList();
+    renderDetail();
+  }
+
+  function renderList() {
+    var list = document.getElementById('svc-list');
+    list.textContent = '';
+    state.data.services.forEach(function (svc) {
+      var dark = fileByName(svc, '-mark-dark.png');
+      var hasMark = dark && dark.state === 'in_repo';
+      var row = el(
+        '<button class="svc-row' + (svc.slug === state.selected ? ' sel' : '') + '">' +
+          '<div class="svc-tile">' +
+            (hasMark
+              ? '<img src="' + esc(dark.mirror_url) + '" alt="">'
+              : '<div class="initials">' + esc(initials(svc.name)) + '</div>') +
+          '</div>' +
+          '<div class="svc-meta">' +
+            '<div class="svc-name">' + esc(svc.name) + '</div>' +
+            '<div class="svc-slug">' + esc(svc.slug) + '/</div>' +
+          '</div>' +
+          '<div class="dot" style="background:' + STATUS[svc.status].color + '"></div>' +
+        '</button>');
+      row.addEventListener('click', function () {
+        state.selected = svc.slug;
+        state.copied = false;
+        render();
+      });
+      list.appendChild(row);
+    });
+  }
+
+  function chipFor(f) {
+    if (f.state === 'missing') return { cls: 'bad', label: 'missing' };
+    if (f.check && !f.check.ok) return { cls: 'bad', label: 'url failing' };
+    if (f.check && f.check.ok) return { cls: 'ok', label: 'in repo' };
+    return { cls: 'neutral', label: 'unverified' };
+  }
+
+  function tileInner(url, hasMark, name) {
+    return hasMark
+      ? '<img src="' + esc(url) + '" alt="">'
+      : '<div class="tile-initials">' + esc(initials(name)) + '</div>';
+  }
+
+  function renderDetail() {
+    var svc = selected();
+    var meta = STATUS[svc.status];
+    var light = fileByName(svc, '-mark-light.png');
+    var dark = fileByName(svc, '-mark-dark.png');
+    var devDark = fileByName(svc, '-mark-dark-dev.png');
+    var hasLight = light && light.state === 'in_repo';
+    var hasDark = dark && dark.state === 'in_repo';
+    var canonical = state.data.canonical_base + svc.slug + '/' + svc.slug + '-mark-light.png';
+    var uploads = state.data.uploads_enabled;
+
+    var fileRows = svc.files.map(function (f) {
+      var chip = chipFor(f);
+      return '<div class="file-row">' +
+        '<div class="file-name">' + esc(f.path) + '</div>' +
+        '<div class="file-role">' + esc(f.role) + '</div>' +
+        '<div class="chip ' + chip.cls + '">' + chip.label + '</div>' +
+      '</div>';
+    }).join('');
+
+    var stagedRows = (svc.staged || []).map(function (up) {
+      return '<div class="file-row">' +
+        '<div class="file-name">' + esc(up.filename) + '</div>' +
+        '<div class="file-role">' + esc((up.size_bytes / 1024).toFixed(1)) + ' KiB — awaiting a human commit</div>' +
+        '<div class="chip ok">staged</div>' +
+      '</div>';
+    }).join('');
+
+    var uploadHint = uploads
+      ? 'PNG, square, 512px or larger. Staged for review, then committed to ' +
+        svc.slug + '/' + svc.slug + '-mark-light.png'
+      : 'uploads are disabled on this deployment';
+
+    var detail = document.getElementById('detail');
+    detail.textContent = '';
+    detail.appendChild(el(
+      '<div class="detail-head">' +
+        '<div style="display:flex; flex-direction:column; gap:8px;">' +
+          '<div class="detail-title">' + esc(svc.name) + '</div>' +
+          '<div class="detail-note">' + esc(svc.note) + '</div>' +
+        '</div>' +
+        '<div class="status-chip" style="color:' + meta.color + '">' +
+          '<span class="dot" style="background:' + meta.color + '"></span>' +
+          '<span>' + meta.label + '</span>' +
+        '</div>' +
+      '</div>'));
+
+    var urlPanel = el(
+      '<section class="panel">' +
+        '<div class="panel-head"><span>Canonical URL</span></div>' +
+        '<div class="url-row">' +
+          '<div class="url-text">' + esc(canonical) + '</div>' +
+          '<button class="copy-btn">' + (state.copied ? 'copied' : 'copy') + '</button>' +
+        '</div>' +
+      '</section>');
+    urlPanel.querySelector('.copy-btn').addEventListener('click', function () {
+      if (navigator.clipboard) navigator.clipboard.writeText(canonical);
+      state.copied = true;
+      renderDetail();
+      setTimeout(function () { state.copied = false; renderDetail(); }, 1400);
+    });
+    detail.appendChild(urlPanel);
+
+    detail.appendChild(el(
+      '<section class="panel">' +
+        '<div class="panel-head"><span>Files</span></div>' +
+        '<div>' + fileRows + stagedRows + '</div>' +
+      '</section>'));
+
+    detail.appendChild(el(
+      '<section class="panel">' +
+        '<div class="panel-head"><span>Rendered</span><span class="sub">launcher tile, 48px</span></div>' +
+        '<div class="rendered">' +
+          '<div class="swatch on-light">' +
+            '<div class="tile">' + tileInner(hasLight ? light.mirror_url : '', hasLight, svc.name) + '</div>' +
+            '<div class="label">on light</div>' +
+          '</div>' +
+          '<div class="swatch on-dark">' +
+            '<div class="tile">' + tileInner(hasDark ? dark.mirror_url : '', hasDark, svc.name) + '</div>' +
+            '<div class="label">on dark</div>' +
+          '</div>' +
+          '<div class="swatch dev-swatch">' +
+            '<div class="tile-wrap"><div class="tile">' +
+              tileInner(devDark && devDark.state === 'in_repo' ? devDark.mirror_url : '', devDark && devDark.state === 'in_repo', svc.name) +
+            '</div></div>' +
+            '<div class="label">dev build</div>' +
+          '</div>' +
+          '<div class="swatch nolabel-swatch">' +
+            '<div class="tile"><div class="tile-initials">' + esc(initials(svc.name)) + '</div></div>' +
+            '<div class="label">no logo_url</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>'));
+
+    var upload = el(
+      '<section class="upload' + (state.dragging ? ' dragging' : '') + (uploads ? '' : ' disabled') + '">' +
+        '<div>' +
+          '<div class="upload-title">Upload a new mark</div>' +
+          '<div class="upload-hint">' + esc(uploadHint) + '</div>' +
+        '</div>' +
+        '<div class="choose-btn">Choose file</div>' +
+        '<input type="file" accept="image/png,image/svg+xml,image/*" style="display:none">' +
+      '</section>');
+    var input = upload.querySelector('input');
+    if (uploads) {
+      upload.addEventListener('click', function () { input.click(); });
+      input.addEventListener('change', function () {
+        if (input.files && input.files[0]) send(svc, input.files[0], upload);
+      });
+      upload.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        upload.classList.add('dragging');
+      });
+      upload.addEventListener('dragleave', function () { upload.classList.remove('dragging'); });
+      upload.addEventListener('drop', function (e) {
+        e.preventDefault();
+        upload.classList.remove('dragging');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) send(svc, e.dataTransfer.files[0], upload);
+      });
+    }
+    detail.appendChild(upload);
+
+    detail.appendChild(el(
+      '<div class="source-line"><span class="glyph">&#9633;</span><span>legacy source: ' +
+      esc(svc.legacy_source || 'none') + '</span></div>'));
+  }
+
+  function token(forceAsk) {
+    var t = null;
+    try { t = localStorage.getItem('placard-token'); } catch (e) {}
+    if (!t || forceAsk) {
+      t = window.prompt('Staging token (PLACARD_UPLOAD_TOKEN):', t || '');
+      if (t) { try { localStorage.setItem('placard-token', t); } catch (e) {} }
+    }
+    return t;
+  }
+
+  function send(svc, file, upload, retried) {
+    var t = token(retried);
+    if (!t) return;
+    var hint = upload.querySelector('.upload-hint');
+    hint.textContent = 'uploading ' + file.name + '…';
+    var form = new FormData();
+    form.append('file', file, file.name);
+    fetch('/api/services/' + svc.slug + '/upload', {
+      method: 'POST',
+      headers: { 'X-Placard-Token': t },
+      body: form
+    }).then(function (r) {
+      if (r.status === 401 && !retried) {
+        try { localStorage.removeItem('placard-token'); } catch (e) {}
+        return send(svc, file, upload, true);
+      }
+      return r.json().then(function (body) {
+        if (!r.ok) throw new Error(body.error || ('upload failed (' + r.status + ')'));
+        hint.textContent = file.name + ' staged — a human commits it to ' + svc.slug + '/';
+        return load();
+      });
+    }).catch(function (err) {
+      hint.textContent = String(err.message || err);
+    });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
