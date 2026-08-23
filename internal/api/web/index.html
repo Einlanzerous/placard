@@ -38,6 +38,13 @@
   .aside-head { display:flex; align-items:baseline; justify-content:space-between; padding:16px 20px 10px;
                 font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.12em;
                 text-transform:uppercase; color:#6f767c; }
+  .filter-wrap { padding:0 20px 10px; }
+  .filter { width:100%; box-sizing:border-box; font-family:'IBM Plex Mono', monospace; font-size:11.5px;
+            color:#e6e8ea; background:#191c1f; border:1px solid #2a2e32; border-radius:6px;
+            padding:8px 11px; outline:none; }
+  .filter:focus { border-color:#3a4045; }
+  .filter::placeholder { color:#5f666b; }
+  .no-match { padding:14px 12px; font-family:'IBM Plex Mono', monospace; font-size:11px; color:#5f666b; }
   .svc-list { overflow:auto; padding:0 10px 16px; display:flex; flex-direction:column; gap:4px; }
   .svc-row { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:12px; padding:10px 12px;
              border-radius:8px; border:1px solid transparent; cursor:pointer; background:transparent; text-align:left;
@@ -157,6 +164,9 @@
   <div class="layout">
     <aside>
       <div class="aside-head"><span>Services</span><span id="count-label"></span></div>
+      <div class="filter-wrap">
+        <input id="filter" class="filter" type="search" placeholder="filter services&hellip;" autocomplete="off" spellcheck="false">
+      </div>
       <div class="svc-list" id="svc-list"></div>
     </aside>
     <main>
@@ -176,7 +186,7 @@
     unset:       { label: 'unset',       color: '#8b9298' }
   };
 
-  var state = { data: null, selected: null, copied: false, dragging: false };
+  var state = { data: null, selected: null, copied: false, dragging: false, filter: '' };
 
   function initials(name) {
     var p = name.trim().split(/[\s-]+/);
@@ -233,7 +243,15 @@
   function renderList() {
     var list = document.getElementById('svc-list');
     list.textContent = '';
-    state.data.services.forEach(function (svc) {
+    var q = state.filter.trim().toLowerCase();
+    var shown = state.data.services.filter(function (svc) {
+      return !q || svc.name.toLowerCase().indexOf(q) >= 0 || svc.slug.indexOf(q) >= 0;
+    });
+    if (!shown.length) {
+      list.appendChild(el('<div class="no-match">no service matches &ldquo;' + esc(q) + '&rdquo;</div>'));
+      return;
+    }
+    shown.forEach(function (svc) {
       var dark = fileByName(svc, '-mark-dark.png');
       var hasMark = dark && dark.state === 'in_repo';
       var row = el(
@@ -434,6 +452,11 @@
       hint.textContent = String(err.message || err);
     });
   }
+
+  document.getElementById('filter').addEventListener('input', function (e) {
+    state.filter = e.target.value;
+    renderList();
+  });
 
   load();
 })();
