@@ -36,15 +36,23 @@ func Badge(src image.Image) *image.RGBA {
 	out := image.NewRGBA(image.Rect(0, 0, w, h))
 	draw.Draw(out, out.Bounds(), src, b.Min, draw.Src)
 
-	m := w
-	if h < m {
-		m = h
+	// Proportioned for the actual consumer: a launcher object-fits the whole
+	// image into a ~48px tile, so display scale is set by the LONGEST
+	// dimension — size against it, clamped so a wide wordmark's badge still
+	// fits its short side (PCAD-8; sizing against min-dim made argosy's badge
+	// ~3px tall at launcher scale).
+	minDim, maxDim := w, h
+	if h < w {
+		minDim, maxDim = h, w
 	}
-	badgeH := int(math.Round(0.18 * float64(m)))
+	badgeH := int(math.Round(0.22 * float64(maxDim)))
+	if limit := int(math.Round(0.45 * float64(minDim))); badgeH > limit {
+		badgeH = limit
+	}
 	if badgeH < 14 {
 		badgeH = 14
 	}
-	margin := int(math.Round(0.045 * float64(m)))
+	margin := int(math.Round(0.045 * float64(minDim)))
 	if margin < 3 {
 		margin = 3
 	}

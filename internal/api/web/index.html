@@ -113,8 +113,10 @@
   .dev-swatch { background:#1a1d20; border:1px solid #3d3a21; }
   .dev-swatch .tile-wrap { position:relative; width:64px; height:64px; }
   .dev-swatch .tile { position:absolute; inset:0; background:linear-gradient(150deg,#30353a,#1d2124); border:1px solid #3a4045; }
-  .dev-swatch .tile img { width:56px; height:56px; }
   .dev-swatch .label { color:#c9b53f; }
+  .dev-chip { position:absolute; right:-5px; bottom:-5px; padding:2px 5px 3px; border-radius:5px;
+              background:#ffd400; border:2px solid #1a1d20; font-family:'IBM Plex Mono', monospace;
+              font-size:8.5px; font-weight:600; letter-spacing:0.08em; color:#141414; line-height:1; }
   .nolabel-swatch { background:#1a1d20; border:1px dashed #33383d; }
   .nolabel-swatch .tile { border-radius:13px; background:#26292c; }
   .nolabel-swatch .tile-initials { font-size:18px; color:#6c7278; }
@@ -295,7 +297,6 @@
     var meta = STATUS[svc.status];
     var light = fileByName(svc, '-mark-light.png');
     var dark = fileByName(svc, '-mark-dark.png');
-    var devDark = fileByName(svc, '-mark-dark-dev.png');
     var hasLight = light && light.state === 'in_repo';
     var hasDark = dark && dark.state === 'in_repo';
     var canonical = state.data.canonical_base + svc.slug + '/' + svc.slug + '-mark-light.png';
@@ -372,9 +373,14 @@
             '<div class="label">on dark</div>' +
           '</div>' +
           '<div class="swatch dev-swatch">' +
-            '<div class="tile-wrap"><div class="tile">' +
-              tileInner(devDark && devDark.state === 'in_repo' ? devDark.mirror_url : '', devDark && devDark.state === 'in_repo', svc.name) +
-            '</div></div>' +
+            // The regular mark plus the CSS chip, per the design — the chip is
+            // sized against the tile so it reads at any mark aspect. The baked
+            // -dev.png is what dev launchers actually consume; this tile shows
+            // what its corner badge MEANS, not the file itself (PCAD-8).
+            '<div class="tile-wrap">' +
+              '<div class="tile">' + tileInner(hasDark ? dark.mirror_url : '', hasDark, svc.name) + '</div>' +
+              '<div class="dev-chip">DEV</div>' +
+            '</div>' +
             '<div class="label">dev build</div>' +
           '</div>' +
           '<div class="swatch nolabel-swatch">' +
