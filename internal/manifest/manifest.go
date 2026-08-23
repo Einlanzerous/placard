@@ -62,6 +62,13 @@ func Parse(data []byte) (*Manifest, error) {
 
 func (s Service) SVG() string { return s.Slug + "/" + s.Slug + "-mark.svg" }
 
+// VariantSVG is the optional per-variant raster source: when present it
+// drives that variant's PNG instead of the shared SVG() (a mark whose light
+// and dark adaptations genuinely differ — placard's plate).
+func (s Service) VariantSVG(variant string) string {
+	return s.Slug + "/" + s.Slug + "-mark-" + variant + ".svg"
+}
+
 func (s Service) PNG(variant string) string {
 	return s.Slug + "/" + s.Slug + "-mark-" + variant + ".png"
 }

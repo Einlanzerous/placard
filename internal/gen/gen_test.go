@@ -70,6 +70,48 @@ func TestRasterSVGDimensionsAndFill(t *testing.T) {
 	}
 }
 
+// A variant-specific SVG drives its own PNG; the shared SVG covers the rest
+// (PCAD-9 — placard's plate adapts per surface, switchyard's coral does not).
+func TestPerVariantSVGSources(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, "gamma"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	write := func(rel, content string) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(root, rel), []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("services.json", `{"services":[{"slug":"gamma","name":"Gamma","raster_from_svg":true}]}`)
+	write("gamma/gamma-mark.svg", testSVG) // coral
+	write("gamma/gamma-mark-light.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50">
+		<rect x="0" y="0" width="100" height="50" fill="#101010"/></svg>`)
+
+	if err := Run(root, func(string, ...any) {}); err != nil {
+		t.Fatal(err)
+	}
+	read := func(rel string) []byte {
+		t.Helper()
+		data, err := os.ReadFile(filepath.Join(root, rel))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return data
+	}
+	light, dark := read("gamma/gamma-mark-light.png"), read("gamma/gamma-mark-dark.png")
+	if bytes.Equal(light, dark) {
+		t.Fatal("light PNG should come from gamma-mark-light.svg, not the shared SVG")
+	}
+	img, err := png.Decode(bytes.NewReader(dark))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c := img.(*image.RGBA).RGBAAt(512, 256); c.R != 0xe2 {
+		t.Errorf("dark PNG centre = %v, want the shared SVG's coral", c)
+	}
+}
+
 // Run over a miniature repo tree: idempotent, and dev variants appear for
 // committed PNGs while markless services are skipped without error.
 func TestRunIsIdempotent(t *testing.T) {

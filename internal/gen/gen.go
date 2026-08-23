@@ -35,17 +35,32 @@ func Run(root string, logf func(format string, args ...any)) error {
 
 	for _, svc := range m.Services {
 		if svc.RasterFromSVG {
-			img, err := rasterSVG(filepath.Join(root, filepath.FromSlash(svc.SVG())), rasterHeight)
-			if err != nil {
-				// Loud, not skipped: the flag is a claim that the SVG is the
-				// source of truth, and a missing/broken source is a repo bug.
-				return fmt.Errorf("%s: raster_from_svg: %w", svc.Slug, err)
-			}
+			// Each variant renders from its own SVG when one exists
+			// (<svc>-mark-light.svg / -dark.svg), else from the shared
+			// <svc>-mark.svg — a mark can adapt per surface without every
+			// mark having to (PCAD-9). Rasters are cached per source so the
+			// shared case still renders once.
+			rendered := map[string]*image.RGBA{}
 			for _, v := range manifest.Variants {
+				src := svc.SVG()
+				if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(svc.VariantSVG(v)))); err == nil {
+					src = svc.VariantSVG(v)
+				}
+				img, ok := rendered[src]
+				if !ok {
+					img, err = rasterSVG(filepath.Join(root, filepath.FromSlash(src)), rasterHeight)
+					if err != nil {
+						// Loud, not skipped: the flag is a claim that the SVG
+						// is the source of truth, and a missing/broken source
+						// is a repo bug.
+						return fmt.Errorf("%s: raster_from_svg: %w", svc.Slug, err)
+					}
+					rendered[src] = img
+				}
 				if err := writePNG(filepath.Join(root, filepath.FromSlash(svc.PNG(v))), img); err != nil {
 					return err
 				}
-				logf("gen: wrote %s (from %s)", svc.PNG(v), svc.SVG())
+				logf("gen: wrote %s (from %s)", svc.PNG(v), src)
 			}
 		}
 

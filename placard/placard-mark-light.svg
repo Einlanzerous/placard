@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- The Placard mark adapted for LIGHT surfaces (PCAD-9): same plate-and-
+       signal-square geometry as placard-mark.svg, light plate so it reads as
+       a designed mark on white rather than a dark slab. placard-mark.svg
+       (the dark plate) stays the canonical carried SVG and drives the dark
+       PNGs; `placard gen` rasters this file into placard-mark-light.png.
+
+       Rounded corners are explicit arc paths rather than rect rx: the
+       generator's rasterizer (oksvg) ignores rx on <rect>. -->
+  <defs>
+    <linearGradient id="plate-light" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#f6f7f8"/>
+      <stop offset="1" stop-color="#dde0e3"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#plate-light)" stroke="#c3c7cb" stroke-width="12"
+        d="M112 8 H400 A104 104 0 0 1 504 112 V400 A104 104 0 0 1 400 504 H112 A104 104 0 0 1 8 400 V112 A104 104 0 0 1 112 8 Z"/>
+  <path fill="#b8ff2e"
+        d="M196 166 H316 A30 30 0 0 1 346 196 V316 A30 30 0 0 1 316 346 H196 A30 30 0 0 1 166 316 V196 A30 30 0 0 1 196 166 Z"/>
+</svg>

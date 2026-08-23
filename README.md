@@ -54,7 +54,10 @@ verifies its own canonical URLs and shows the result on the front page.
 ## Adding a service
 
 1. `mkdir <service>/` and add the marks — either both PNGs, or just
-   `<service>-mark.svg` plus `"raster_from_svg": true` in the manifest.
+   `<service>-mark.svg` plus `"raster_from_svg": true` in the manifest. A
+   mark whose light and dark adaptations genuinely differ commits
+   `<service>-mark-light.svg` / `-dark.svg` alongside — each drives its own
+   PNG, and the shared SVG covers whichever variant has no file of its own.
 2. Add the service's row to `services.json`.
 3. `go run ./cmd/placard gen .` — rasterizes svg-sourced PNGs and writes the
    `-dev.png` siblings.
