@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.2.0](https://github.com/Einlanzerous/placard/compare/v0.1.0...v0.2.0) (2026-08-23)
+
+
+### Features
+
+* sidebar filter box + #slug deep links (PCAD-7) ([7b65d5e](https://github.com/Einlanzerous/placard/commit/7b65d5ed98559af16ffd53b004c034b5eec1536b))
+
+
+### Bug Fixes
+
+* a real light-surface mark for placard — per-variant SVG raster sources (PCAD-9) ([d436b7f](https://github.com/Einlanzerous/placard/commit/d436b7fe6dd46e3ecc1d99e0b5a3699ec089aa7c))
+* dev-badge legibility — design overlay on the preview tile, launcher-scale baked proportions (PCAD-8) ([0adb4a7](https://github.com/Einlanzerous/placard/commit/0adb4a73ab3dd88141909e02597662d65b9b73d6))
+
+
+### Polish
+
+* center the detail column on wide screens (PCAD-6) ([9d39dbd](https://github.com/Einlanzerous/placard/commit/9d39dbd6e49489d830a15bf96cddb027277f784a))
+
 ## 0.1.0 (2026-08-23)
 
 
