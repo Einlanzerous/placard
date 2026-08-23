@@ -154,11 +154,11 @@ func (s *Server) storeOr(w http.ResponseWriter) *store.Store {
 
 // latestChecks is tolerant: a DB blip must not take the front page down with
 // it — the marks are the product, the checks are commentary.
-func (s *Server) latestChecks(ctx context.Context) map[string]store.MarkCheck {
+func (s *Server) latestChecks(ctx context.Context, kind string) map[string]store.MarkCheck {
 	if s.st == nil {
 		return nil
 	}
-	checks, err := s.st.LatestChecks(ctx)
+	checks, err := s.st.LatestChecks(ctx, kind)
 	if err != nil {
 		log.Printf("api: latest checks: %v", err)
 		return nil

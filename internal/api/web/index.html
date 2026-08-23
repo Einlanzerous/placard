@@ -18,7 +18,14 @@
   ::selection { background:#b8ff2e; color:#0d0e0f; }
   .mono { font-family:'IBM Plex Mono', monospace; }
 
-  .app { height:100vh; overflow:hidden; display:grid; grid-template-rows:auto minmax(0,1fr); }
+  .app { height:100vh; overflow:hidden; display:grid; grid-template-rows:auto auto minmax(0,1fr); }
+
+  /* Shown only when the edge self-check fails (PCAD-10): placard's own
+     hostname refusing sessionless fetches is the one failure a signed-in
+     viewer cannot see for themselves. */
+  .edge-alert { display:none; padding:10px 28px; background:#241a1f; border-bottom:1px solid #ff3d8b;
+                color:#ff3d8b; font-family:'IBM Plex Mono', monospace; font-size:11.5px; line-height:1.5; }
+  .edge-alert.on { display:block; }
 
   header { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 28px;
            border-bottom:1px solid #24282c; background:linear-gradient(180deg,#15181a,#101213); }
@@ -170,6 +177,8 @@
     </div>
   </header>
 
+  <div class="edge-alert" id="edge-alert"></div>
+
   <div class="layout">
     <aside>
       <div class="aside-head"><span>Services</span><span id="count-label"></span></div>
@@ -245,8 +254,28 @@
     document.getElementById('count-label').textContent =
       String(data.services.length).padStart(2, '0');
 
+    renderEdgeAlert();
     renderList();
     renderDetail();
+  }
+
+  function renderEdgeAlert() {
+    var alertEl = document.getElementById('edge-alert');
+    var edge = state.data.edge;
+    if (!edge || edge.ok !== false) {
+      alertEl.className = 'edge-alert';
+      return;
+    }
+    var reason = '';
+    (edge.checks || []).some(function (c) {
+      if (!c.ok) { reason = c.file + ': ' + (c.error || 'failing'); return true; }
+      return false;
+    });
+    alertEl.textContent = 'THIS HOSTNAME IS REFUSING SESSIONLESS REQUESTS — ' + reason +
+      '. You can read this page because you hold an Access session; launcher icons and mirror URLs are ' +
+      'serving login HTML to everyone else. Almost certainly a gated Access application landed on this ' +
+      'hostname — it must carry none (docs/deploy.md §4–5).';
+    alertEl.className = 'edge-alert on';
   }
 
   function renderList() {

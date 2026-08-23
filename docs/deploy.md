@@ -83,6 +83,14 @@ everything else works.
    launcher tile: Access → Applications → Add → **Bookmark**, domain
    `https://placard.zerogravity.industries`, App Launcher visible, logo URL
 
+   > ⚠ The dashboard's "Add an application" flow **defaults to
+   > `self_hosted`**, which attaches the members policy and gates the
+   > hostname. That happened on day one: every sessionless request 302'd to
+   > the Access login, invisibly to anyone signed in, and only a manual curl
+   > noticed. Placard now notices for you — the edge self-check below — but
+   > run the §5 curls after *any* Access change touching this hostname
+   > anyway.
+
    ```
    https://cdn.jsdelivr.net/gh/Einlanzerous/placard@main/placard/placard-mark-light.png
    ```
@@ -105,6 +113,14 @@ curl -sI https://placard.zerogravity.industries/placard/placard-mark-light.png |
 - The serve loop re-verifies every canonical jsDelivr URL on
   `PLACARD_CHECK_INTERVAL` (default 6h); `placard check` is the one-shot
   form and exits non-zero if anything is failing.
+- **Edge self-check** (PCAD-10): with `PLACARD_PUBLIC_BASE_URL` set (compose
+  sets `https://placard.zerogravity.industries`), every pass also fetches the
+  front page and one mirror mark **through the public edge**, redirects not
+  followed — a 302 to the Access login or HTML where an image belongs records
+  as failing, `placard check` exits non-zero, and the front page shows a
+  full-width alert naming the failure (visible precisely to the signed-in
+  people the gate doesn't block). `/api/services` carries the state under
+  `edge`.
 - No database ⇒ checks and staged uploads off, marks and page still serve.
 - A staged upload is fetched with
   `curl -H "X-Placard-Token: …" https://…/api/staged/<id> -o mark.png`,

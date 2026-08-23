@@ -63,7 +63,7 @@ func TestChecksLatestWins(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	latest, err := s.LatestChecks(ctx)
+	latest, err := s.LatestChecks(ctx, KindCanonical)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,6 +73,41 @@ func TestChecksLatestWins(t *testing.T) {
 	}
 	if !got.OK || got.HTTPStatus == nil || *got.HTTPStatus != 200 {
 		t.Errorf("latest = %+v, want the second (healthy) check", got)
+	}
+}
+
+// Edge and canonical checks for the same file must not shadow each other —
+// the kind column keeps the two observations separate (PCAD-10).
+func TestCheckKindsAreSeparate(t *testing.T) {
+	s := testStore(t)
+	ctx := context.Background()
+
+	file := "placard/placard-mark-light.png"
+	if err := s.RecordCheck(ctx, MarkCheck{ // kind empty => canonical
+		Service: "placard", File: file, URL: "https://cdn.example/x.png", OK: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	time.Sleep(10 * time.Millisecond)
+	if err := s.RecordCheck(ctx, MarkCheck{ // newer, failing, edge
+		Kind: KindEdge, Service: "placard", File: file, URL: "https://placard.example/x.png", OK: false,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	canonical, err := s.LatestChecks(ctx, KindCanonical)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c, present := canonical[file]; !present || !c.OK || c.Kind != KindCanonical {
+		t.Errorf("canonical latest = %+v; a newer edge row must not shadow it", c)
+	}
+	edge, err := s.LatestChecks(ctx, KindEdge)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c, present := edge[file]; !present || c.OK {
+		t.Errorf("edge latest = %+v, want the failing edge row", c)
 	}
 }
 

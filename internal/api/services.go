@@ -1,12 +1,14 @@
 package api
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"io"
 	"net/http"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/Einlanzerous/placard/internal/catalog"
@@ -39,10 +41,25 @@ type serviceJSON struct {
 	Staged       []store.StagedUpload `json:"staged"`
 }
 
+// edgeJSON is the health of placard's OWN public hostname (PCAD-10): checks
+// made through the edge, where an Access gate is visible. Global, not
+// per-service — a gate breaks the whole host at once.
+type edgeJSON struct {
+	Configured bool            `json:"configured"`     // PLACARD_PUBLIC_BASE_URL set
+	OK         *bool           `json:"ok"`             // null until a pass has run
+	Checks     []edgeCheckJSON `json:"checks"`
+}
+
+type edgeCheckJSON struct {
+	File string `json:"file"`
+	store.MarkCheck
+}
+
 type servicesJSON struct {
 	Repo           string        `json:"repo"`
 	CanonicalBase  string        `json:"canonical_base"`
 	UploadsEnabled bool          `json:"uploads_enabled"`
+	Edge           edgeJSON      `json:"edge"`
 	Services       []serviceJSON `json:"services"`
 }
 
@@ -99,7 +116,7 @@ func (s *Server) buildService(e catalog.Entry, checks map[string]store.MarkCheck
 }
 
 func (s *Server) handleServices(w http.ResponseWriter, r *http.Request) {
-	checks := s.latestChecks(r.Context())
+	checks := s.latestChecks(r.Context(), store.KindCanonical)
 	staged := s.stagedFor(r.Context(), "")
 	bySvc := map[string][]store.StagedUpload{}
 	for _, up := range staged {
@@ -110,11 +127,35 @@ func (s *Server) handleServices(w http.ResponseWriter, r *http.Request) {
 		Repo:           s.cfg.PublicRepo,
 		CanonicalBase:  s.cfg.CanonicalBase(),
 		UploadsEnabled: s.cfg.UploadToken != "" && s.st != nil,
+		Edge:           s.buildEdge(r.Context()),
 	}
 	for _, e := range s.entries {
 		resp.Services = append(resp.Services, s.buildService(e, checks, bySvc[e.Slug]))
 	}
 	writeJSON(w, http.StatusOK, resp)
+}
+
+func (s *Server) buildEdge(ctx context.Context) edgeJSON {
+	edge := edgeJSON{Configured: s.cfg.PublicBaseURL != "", Checks: []edgeCheckJSON{}}
+	if !edge.Configured {
+		return edge
+	}
+	byFile := s.latestChecks(ctx, store.KindEdge)
+	files := make([]string, 0, len(byFile))
+	for f := range byFile {
+		files = append(files, f)
+	}
+	sort.Strings(files)
+	allOK := true
+	for _, f := range files {
+		c := byFile[f]
+		edge.Checks = append(edge.Checks, edgeCheckJSON{File: f, MarkCheck: c})
+		allOK = allOK && c.OK
+	}
+	if len(edge.Checks) > 0 {
+		edge.OK = &allOK
+	}
+	return edge
 }
 
 func (s *Server) findEntry(slug string) (catalog.Entry, bool) {
@@ -132,7 +173,7 @@ func (s *Server) handleService(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "unknown service")
 		return
 	}
-	svc := s.buildService(e, s.latestChecks(r.Context()), s.stagedFor(r.Context(), e.Slug))
+	svc := s.buildService(e, s.latestChecks(r.Context(), store.KindCanonical), s.stagedFor(r.Context(), e.Slug))
 	writeJSON(w, http.StatusOK, svc)
 }
 

@@ -49,7 +49,11 @@ Silently is the operative word: Cloudflare accepts a `logo_url` pointing at a
 404 without complaint and the launcher just falls back to initials, so a
 broken URL is indistinguishable from an unset one, with no error anywhere.
 That is why this repo exists — and why the placard service periodically
-verifies its own canonical URLs and shows the result on the front page.
+verifies its own canonical URLs and shows the result on the front page. It
+also fetches **through its own public edge** (`PLACARD_PUBLIC_BASE_URL`):
+a gated Access application landing on placard's hostname is invisible to
+everyone holding a session, so placard checks as the sessionless world and
+raises a front-page alert when the answer is a login redirect.
 
 ## Adding a service
 

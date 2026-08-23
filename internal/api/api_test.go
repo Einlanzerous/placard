@@ -80,6 +80,24 @@ func TestServicesIndex(t *testing.T) {
 	if statuses["wiki"] != "unset" {
 		t.Errorf("wiki status = %q, want unset", statuses["wiki"])
 	}
+
+	// No PLACARD_PUBLIC_BASE_URL: the edge block says so rather than vanishing.
+	if got.Edge.Configured || got.Edge.OK != nil {
+		t.Errorf("edge = %+v, want unconfigured with null ok", got.Edge)
+	}
+}
+
+// With a public base configured but no pass recorded yet, edge.ok stays null
+// (unknown), never a false healthy.
+func TestServicesEdgeConfigured(t *testing.T) {
+	rec := get(t, testServer(t, config.Config{PublicBaseURL: "https://placard.example"}), "/api/services")
+	var got servicesJSON
+	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+		t.Fatal(err)
+	}
+	if !got.Edge.Configured || got.Edge.OK != nil || len(got.Edge.Checks) != 0 {
+		t.Errorf("edge = %+v, want configured, null ok, no checks", got.Edge)
+	}
 }
 
 func TestServiceDetailAndUnknown(t *testing.T) {

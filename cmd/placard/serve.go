@@ -88,12 +88,17 @@ func checkLoop(ctx context.Context, cfg config.Config, st *store.Store, entries 
 
 func recordChecks(ctx context.Context, cfg config.Config, st *store.Store, entries []catalog.Entry) {
 	results := checker.CheckAll(ctx, entries, cfg.CanonicalBase(), nil)
-	ok := 0
-	for _, c := range results {
+	edge := checker.CheckEdge(ctx, entries, cfg.PublicBaseURL, nil)
+	ok, edgeOK := 0, 0
+	for _, c := range append(results, edge...) {
 		if c.OK {
-			ok++
+			if c.Kind == store.KindEdge {
+				edgeOK++
+			} else {
+				ok++
+			}
 		} else if c.Error != nil {
-			log.Printf("check: %s FAILING: %s (%s)", c.File, *c.Error, c.URL)
+			log.Printf("check: [%s] %s FAILING: %s (%s)", c.Kind, c.File, *c.Error, c.URL)
 		}
 		if err := st.RecordCheck(ctx, c); err != nil {
 			log.Printf("check: record %s: %v", c.File, err)
@@ -101,4 +106,11 @@ func recordChecks(ctx context.Context, cfg config.Config, st *store.Store, entri
 		}
 	}
 	log.Printf("check: %d/%d canonical URLs healthy", ok, len(results))
+	if len(edge) > 0 {
+		state := "SESSIONLESS FETCHES FAILING — is an Access gate on the hostname? (docs/deploy.md §4)"
+		if edgeOK == len(edge) {
+			state = "serving openly"
+		}
+		log.Printf("check: public edge %s (%d/%d)", state, edgeOK, len(edge))
+	}
 }

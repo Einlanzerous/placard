@@ -5,8 +5,17 @@ import (
 	"time"
 )
 
-// MarkCheck is one verification of one canonical URL.
+// Check kinds. Canonical rows verify the jsDelivr URLs the launcher is given;
+// edge rows verify placard's OWN public hostname stays sessionless-fetchable
+// (PCAD-10 — an Access gate there is invisible to everyone holding a session).
+const (
+	KindCanonical = "canonical"
+	KindEdge      = "edge"
+)
+
+// MarkCheck is one verification of one URL.
 type MarkCheck struct {
+	Kind          string     `json:"-"`
 	Service       string     `json:"-"`
 	File          string     `json:"-"`
 	URL           string     `json:"url"`
@@ -19,20 +28,25 @@ type MarkCheck struct {
 }
 
 func (s *Store) RecordCheck(ctx context.Context, c MarkCheck) error {
+	if c.Kind == "" {
+		c.Kind = KindCanonical
+	}
 	_, err := s.pool.Exec(ctx, `
-		INSERT INTO mark_check (service, file, url, ok, http_status, content_type, content_length, error)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-		c.Service, c.File, c.URL, c.OK, c.HTTPStatus, c.ContentType, c.ContentLength, c.Error)
+		INSERT INTO mark_check (kind, service, file, url, ok, http_status, content_type, content_length, error)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		c.Kind, c.Service, c.File, c.URL, c.OK, c.HTTPStatus, c.ContentType, c.ContentLength, c.Error)
 	return err
 }
 
-// LatestChecks returns the most recent check per repo-relative file path.
-func (s *Store) LatestChecks(ctx context.Context) (map[string]MarkCheck, error) {
+// LatestChecks returns the most recent check of the given kind per
+// repo-relative file path.
+func (s *Store) LatestChecks(ctx context.Context, kind string) (map[string]MarkCheck, error) {
 	rows, err := s.pool.Query(ctx, `
 		SELECT DISTINCT ON (service, file)
-		       service, file, url, ok, http_status, content_type, content_length, error, checked_at
+		       kind, service, file, url, ok, http_status, content_type, content_length, error, checked_at
 		FROM mark_check
-		ORDER BY service, file, checked_at DESC`)
+		WHERE kind = $1
+		ORDER BY service, file, checked_at DESC`, kind)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +55,7 @@ func (s *Store) LatestChecks(ctx context.Context) (map[string]MarkCheck, error) 
 	out := make(map[string]MarkCheck)
 	for rows.Next() {
 		var c MarkCheck
-		if err := rows.Scan(&c.Service, &c.File, &c.URL, &c.OK, &c.HTTPStatus,
+		if err := rows.Scan(&c.Kind, &c.Service, &c.File, &c.URL, &c.OK, &c.HTTPStatus,
 			&c.ContentType, &c.ContentLength, &c.Error, &c.CheckedAt); err != nil {
 			return nil, err
 		}

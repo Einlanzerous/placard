@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,6 +20,14 @@ type Config struct {
 	// PublicRepo is the owner/name the canonical jsDelivr URLs point at.
 	// PLACARD_PUBLIC_REPO, default "Einlanzerous/placard".
 	PublicRepo string
+	// PublicBaseURL is placard's own public hostname, e.g.
+	// "https://placard.zerogravity.industries". When set, every check pass
+	// also fetches THROUGH that edge — the front page and one mirror mark —
+	// so an Access gate landing on the hostname surfaces as failing checks
+	// instead of being invisible to everyone holding a session (PCAD-10:
+	// exactly that happened, and only a manual curl noticed). Empty disables
+	// the edge checks. PLACARD_PUBLIC_BASE_URL.
+	PublicBaseURL string
 	// CheckInterval is how often serve re-verifies every canonical URL.
 	// PLACARD_CHECK_INTERVAL (Go duration), default 6h; "0" disables the
 	// ticker (the `placard check` subcommand still works).
@@ -38,6 +47,7 @@ func Load() (Config, error) {
 		Addr:           envOr("PLACARD_ADDR", ":4009"),
 		DatabaseURL:    os.Getenv("PLACARD_DATABASE_URL"),
 		PublicRepo:     envOr("PLACARD_PUBLIC_REPO", "Einlanzerous/placard"),
+		PublicBaseURL:  strings.TrimSuffix(os.Getenv("PLACARD_PUBLIC_BASE_URL"), "/"),
 		CheckInterval:  6 * time.Hour,
 		UploadToken:    os.Getenv("PLACARD_UPLOAD_TOKEN"),
 		MaxUploadBytes: 5 << 20,

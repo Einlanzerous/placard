@@ -26,13 +26,14 @@ func runCheck() error {
 		return err
 	}
 	ctx := context.Background()
-	results := checker.CheckAll(ctx, entries, cfg.CanonicalBase(), nil)
+	results := append(checker.CheckAll(ctx, entries, cfg.CanonicalBase(), nil),
+		checker.CheckEdge(ctx, entries, cfg.PublicBaseURL, nil)...)
 
 	w := tabwriter.NewWriter(os.Stdout, 2, 4, 2, ' ', 0)
 	failing := 0
 	for _, c := range results {
 		if c.OK {
-			fmt.Fprintf(w, "ok\t%s\n", c.URL)
+			fmt.Fprintf(w, "ok\t%s\t%s\n", c.Kind, c.URL)
 			continue
 		}
 		failing++
@@ -40,7 +41,7 @@ func runCheck() error {
 		if c.Error != nil {
 			reason = *c.Error
 		}
-		fmt.Fprintf(w, "FAIL\t%s\t%s\n", c.URL, reason)
+		fmt.Fprintf(w, "FAIL\t%s\t%s\t%s\n", c.Kind, c.URL, reason)
 	}
 	w.Flush()
 
@@ -61,9 +62,9 @@ func runCheck() error {
 	}
 
 	if failing > 0 {
-		return fmt.Errorf("%d of %d canonical URLs failing", failing, len(results))
+		return fmt.Errorf("%d of %d checks failing", failing, len(results))
 	}
-	fmt.Printf("all %d canonical URLs healthy\n", len(results))
+	fmt.Printf("all %d checks healthy\n", len(results))
 	return nil
 }
 
