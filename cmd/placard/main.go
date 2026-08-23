@@ -5,8 +5,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/Einlanzerous/placard/internal/gen"
 	"github.com/Einlanzerous/placard/internal/version"
 )
 
@@ -17,6 +19,14 @@ func main() {
 	}
 
 	switch cmd {
+	case "gen":
+		dir := "."
+		if len(os.Args) > 2 {
+			dir = os.Args[2]
+		}
+		if err := gen.Run(dir, log.Printf); err != nil {
+			log.Fatalf("gen: %v", err)
+		}
 	case "version":
 		fmt.Printf("placard %s", version.Resolved())
 		if version.Commit != "" {
@@ -37,6 +47,7 @@ func usage(w *os.File) {
 
 usage: placard <command>
 
-  version   print build identity
+  gen [dir]   regenerate derived marks (svg rasters + -dev.png variants)
+  version     print build identity
 `)
 }

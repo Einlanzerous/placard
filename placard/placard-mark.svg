@@ -2,13 +2,18 @@
   <!-- The Placard brand mark, from the Claude Design front page header: a dark
        metal plate with the lime signal square. PNGs are generated from this
        file by `placard gen` (raster_from_svg in services.json) — edit here,
-       never the PNGs. -->
+       never the PNGs.
+
+       Rounded corners are explicit arc paths rather than rect rx: the
+       generator's rasterizer (oksvg) ignores rx on <rect>. -->
   <defs>
     <linearGradient id="plate" x1="0.15" y1="0" x2="0.85" y2="1">
       <stop offset="0" stop-color="#4a5055"/>
       <stop offset="1" stop-color="#22262a"/>
     </linearGradient>
   </defs>
-  <rect x="8" y="8" width="496" height="496" rx="104" fill="url(#plate)" stroke="#3a4045" stroke-width="12"/>
-  <rect x="166" y="166" width="180" height="180" rx="30" fill="#b8ff2e"/>
+  <path fill="url(#plate)" stroke="#3a4045" stroke-width="12"
+        d="M112 8 H400 A104 104 0 0 1 504 112 V400 A104 104 0 0 1 400 504 H112 A104 104 0 0 1 8 400 V112 A104 104 0 0 1 112 8 Z"/>
+  <path fill="#b8ff2e"
+        d="M196 166 H316 A30 30 0 0 1 346 196 V316 A30 30 0 0 1 316 346 H196 A30 30 0 0 1 166 316 V196 A30 30 0 0 1 196 166 Z"/>
 </svg>

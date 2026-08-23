@@ -62,3 +62,21 @@ jobs:
       - name: go test
         if: steps.changes.outputs.go == 'true'
         run: go test ./...
+
+  # Derived files (-dev.png siblings, svg-sourced mark PNGs) are written by
+  # `placard gen` from committed sources. Regenerate and fail on any drift —
+  # this is what makes "the dev variant can never drift from the mark it
+  # derives from" (IDEA-22) true rather than aspirational. `git add -A` first
+  # so a brand-new generated file (untracked) fails too, not just an edit.
+  generated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Regenerate derived marks and fail on drift
+        run: |
+          go run ./cmd/placard gen .
+          git add -A
+          git diff --cached --exit-code --stat
