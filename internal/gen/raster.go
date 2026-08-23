@@ -36,7 +36,14 @@ func rasterSVG(path string, targetH int) (*image.RGBA, error) {
 	}
 
 	img := image.NewRGBA(image.Rect(0, 0, w, targetH))
-	icon.SetTarget(0, 0, float64(w), float64(targetH))
+	// Not SetTarget: oksvg subtracts the viewBox origin in UNSCALED units and
+	// then scales it along with the drawing (svg_icon.go: Translate(x-vb.X,
+	// y-vb.Y).Scale(...)), so any non-zero-origin viewBox — a cropped mark
+	// like argosy's glyph window — renders shifted by origin×(scale-1) and
+	// clips. Build the correct transform directly: scale, with the viewBox
+	// origin mapped to 0,0.
+	sw, sh := float64(w)/vb.W, float64(targetH)/vb.H
+	icon.Transform = rasterx.Matrix2D{A: sw, D: sh, E: -vb.X * sw, F: -vb.Y * sh}
 	icon.Draw(rasterx.NewDasher(w, targetH, rasterx.NewScannerGV(w, targetH, img, img.Bounds())), 1.0)
 	return img, nil
 }

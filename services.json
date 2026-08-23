@@ -10,7 +10,8 @@
     {
       "slug": "argosy",
       "name": "Argosy",
-      "note": "The old jsDelivr path rotted when the asset was renamed in its own repo — the stored logo_url 404d and the launcher silently fell back to initials. The canonical copies live here now.",
+      "raster_from_svg": true,
+      "note": "The old jsDelivr path rotted when the asset was renamed in its own repo — the stored logo_url 404d and the launcher silently fell back to initials. The canonical copies live here now: the ship glyph alone (the full wordmark lockup stays in the argosy repo; text is illegible at tile size).",
       "legacy_source": "argosy@main/assets/argosy_white_transparent.png (was argosy_logo_only_light_trans.png)"
     },
     {

@@ -70,6 +70,29 @@ func TestRasterSVGDimensionsAndFill(t *testing.T) {
 	}
 }
 
+// A non-zero-origin viewBox (a cropped mark window) must render its full
+// content — oksvg's SetTarget mishandles the origin, which rasterSVG works
+// around by building the transform itself (PCAD-11).
+func TestRasterCroppedViewBox(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "m.svg")
+	// The rect exactly fills the offset viewBox; every corner must be inked.
+	svg := `<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 60 100 50" width="100" height="50">
+		<rect x="40" y="60" width="100" height="50" fill="#e2623d"/></svg>`
+	if err := os.WriteFile(path, []byte(svg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	img, err := rasterSVG(path, 512)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, h := img.Rect.Dx(), img.Rect.Dy()
+	for _, p := range [][2]int{{2, 2}, {w - 3, 2}, {2, h - 3}, {w - 3, h - 3}, {w / 2, h / 2}} {
+		if c := img.RGBAAt(p[0], p[1]); c.A == 0 {
+			t.Errorf("pixel (%d,%d) empty — offset viewBox content shifted or clipped", p[0], p[1])
+		}
+	}
+}
+
 // A variant-specific SVG drives its own PNG; the shared SVG covers the rest
 // (PCAD-9 — placard's plate adapts per surface, switchyard's coral does not).
 func TestPerVariantSVGSources(t *testing.T) {
