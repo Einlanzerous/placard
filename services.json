@@ -11,7 +11,7 @@
       "slug": "argosy",
       "name": "Argosy",
       "raster_from_svg": true,
-      "note": "The old jsDelivr path rotted when the asset was renamed in its own repo — the stored logo_url 404d and the launcher silently fell back to initials. The canonical copies live here now: the ship glyph alone (the full wordmark lockup stays in the argosy repo; text is illegible at tile size).",
+      "note": "The old jsDelivr path rotted when the asset was renamed in its own repo — the stored logo_url 404d and the launcher silently fell back to initials. The canonical copies live here now: the ship glyph alone (the full wordmark lockup stays in the argosy repo; text is illegible at tile size). Squared 2026-08-27: the glyph is 2.28:1 and the mark inherited that, so Cloudflare's square launcher tile cropped the outer ships off — visible in the launcher and not in Placard's own view, which fits rather than fills. The SVG viewBox now pads to 1:1 instead of cropping tight, so the glyph keeps its scale and gains transparent space above and below.",
       "legacy_source": "argosy@main/assets/argosy_white_transparent.png (was argosy_logo_only_light_trans.png)"
     },
     {
