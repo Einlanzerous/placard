@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Einlanzerous/placard/compare/v0.3.0...v0.3.1) (2026-08-28)
+
+
+### Bug Fixes
+
+* **argosy:** square the tile mark so the launcher stops cropping the ships ([#6](https://github.com/Einlanzerous/placard/issues/6)) ([2c0c1bb](https://github.com/Einlanzerous/placard/commit/2c0c1bbf034e32d004491b4000e695cf69303221))
+
 ## [0.3.0](https://github.com/Einlanzerous/placard/compare/v0.2.2...v0.3.0) (2026-08-23)
 
 
