@@ -54,3 +54,32 @@ Tracked in Switchyard under the **PCAD** project (epic `PCAD-1`).
 - **Postgres is a cache of observations** (check results, staged bytes
   awaiting a human commit). The repo is the source of truth for every mark;
   nothing in the DB is needed to rebuild the served assets.
+- **A mark's shape is measured from the committed bytes, never from a fetch**
+  (PRSR-44). `internal/shape` reads the dimensions and answers whether a square
+  launcher tile will show the mark whole; `catalog.Build` measures every present
+  PNG from the embedded tree. That is why it is a `catalog` fact rather than a
+  `MarkCheck` field: a check is a dated observation about a URL and needs both a
+  network and a database, while the aspect ratio is a property of the *asset* —
+  known offline, on a PR, before jsDelivr has heard of the commit. Filing it
+  under `check` would have made it null on exactly the deployment that has
+  published a mark and never verified it.
+  **The carried SVG is deliberately not measured.** For a `raster_from_svg`
+  service the PNG's aspect follows the viewBox, so measuring the PNG already
+  catches a badly shaped source and names the file a human edits; a second
+  measurement path answering the same question would also break the README's
+  "carried, unverified" contract.
+- **Runtime reports the shape; CI asserts it.** `placard check` prints a `note`
+  line and does **not** count it in its exit code, `/api/services` serves the
+  measurement, and the front page shows it — a badly proportioned mark still
+  serves, every consumer that fits rather than fills renders it correctly, and a
+  letterboxed icon beats two grey initials, so refusing to publish over
+  proportions would be worse than the problem. The one place that *fails* is
+  `TestEveryEmbeddedMarkSurvivesASquareTile`, whose subject is this repo's own
+  committed marks — the same standard `Build` already applies by erroring on a
+  `raster_from_svg` service with no generated PNGs, and CI by failing on
+  generated-file drift. A PR is the last moment a bad mark is cheap to fix. If a
+  service ever needs a deliberately non-square mark, that assertion is the thing
+  to revisit, not the band.
+  The band lives in `internal/shape` with its reasoning beside it, and matches
+  Purser's (PRSR-43) on purpose: the launcher is the only consumer that *crops*,
+  so a mark that survives the strictest one survives the rest.

@@ -28,6 +28,27 @@ type fileJSON struct {
 	CanonicalURL string           `json:"canonical_url"`
 	MirrorURL    string           `json:"mirror_url"`
 	Check        *store.MarkCheck `json:"check"` // null until verified
+	Shape        *shapeJSON       `json:"shape"` // null when unmeasured
+}
+
+// shapeJSON is a mark's proportions and what a square tile will do with them
+// (PRSR-44).
+//
+// Deliberately not folded into `check`: a check is a dated observation about a
+// URL and lives in Postgres, while this is a fact about the committed file and
+// is known with no database and no network. Putting it under `check` would make
+// it null on a deployment that has never run a pass, which is precisely the
+// deployment that has published a mark and not yet looked at it.
+//
+// Both the measurement and the verdict are served. A consumer that crops
+// differently — none today; the launcher is the strictest — can read width and
+// height and decide for itself rather than inheriting this repo's band.
+type shapeJSON struct {
+	Width    int    `json:"width"`
+	Height   int    `json:"height"`
+	Aspect   string `json:"aspect"`    // "2.28:1", long side first
+	TileSafe bool   `json:"tile_safe"` // a square tile shows it whole
+	Note     string `json:"note,omitempty"`
 }
 
 type serviceJSON struct {
@@ -45,8 +66,8 @@ type serviceJSON struct {
 // made through the edge, where an Access gate is visible. Global, not
 // per-service — a gate breaks the whole host at once.
 type edgeJSON struct {
-	Configured bool            `json:"configured"`     // PLACARD_PUBLIC_BASE_URL set
-	OK         *bool           `json:"ok"`             // null until a pass has run
+	Configured bool            `json:"configured"` // PLACARD_PUBLIC_BASE_URL set
+	OK         *bool           `json:"ok"`         // null until a pass has run
 	Checks     []edgeCheckJSON `json:"checks"`
 }
 
@@ -89,6 +110,12 @@ func (s *Server) buildService(e catalog.Entry, checks map[string]store.MarkCheck
 		}
 		if f.Present {
 			fj.State = "in_repo"
+			if sh := f.Shape; sh.Measured() {
+				fj.Shape = &shapeJSON{
+					Width: sh.W, Height: sh.H,
+					Aspect: sh.Aspect(), TileSafe: sh.TileSafe(), Note: sh.Note(),
+				}
+			}
 			if c, ok := checks[f.Path]; ok {
 				c := c
 				fj.Check = &c

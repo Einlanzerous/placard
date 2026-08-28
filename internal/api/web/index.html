@@ -315,6 +315,19 @@
     });
   }
 
+  // The mark's proportions, appended to its role (PRSR-44). A tile-safe mark
+  // shows its dimensions and nothing more; one a square launcher tile would crop
+  // says so in the row, because this page is where a human looks and the upload
+  // hint below already asks for "PNG, square" — this is that request checked
+  // rather than merely stated. An unmeasured file (the carried SVG) says
+  // nothing: never treat unmeasurable as bad.
+  function roleWithShape(f) {
+    if (!f.shape) return f.role;
+    if (f.shape.tile_safe) return f.role + ' \u00b7 ' + f.shape.width + '\u00d7' + f.shape.height;
+    return f.role + ' \u00b7 ' + f.shape.width + '\u00d7' + f.shape.height +
+      ' (' + f.shape.aspect + ') \u2014 cropped in a square tile';
+  }
+
   function chipFor(f) {
     if (f.state === 'missing') return { cls: 'bad', label: 'missing' };
     if (f.check && !f.check.ok) return { cls: 'bad', label: 'url failing' };
@@ -342,7 +355,7 @@
       var chip = chipFor(f);
       return '<div class="file-row">' +
         '<div class="file-name">' + esc(f.path) + '</div>' +
-        '<div class="file-role">' + esc(f.role) + '</div>' +
+        '<div class="file-role">' + esc(roleWithShape(f)) + '</div>' +
         '<div class="chip ' + chip.cls + '">' + chip.label + '</div>' +
       '</div>';
     }).join('');

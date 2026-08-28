@@ -194,3 +194,56 @@ func TestImageContentType(t *testing.T) {
 		t.Error("empty upload must be refused")
 	}
 }
+
+// A mark's proportions are served with no database and no check pass (PRSR-44).
+//
+// That independence is the assertion, not an incidental: this server is built
+// with a nil store, so `check` is null on every file, and `shape` is populated
+// anyway. A deployment that has published a mark and never run a verification
+// pass is exactly the one that most needs to be told the tile will crop it, and
+// folding this under `check` would have made it null there.
+func TestServicesCarryMarkShapeWithoutAStore(t *testing.T) {
+	rec := get(t, testServer(t, config.Config{}), "/api/services")
+	var got servicesJSON
+	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+		t.Fatal(err)
+	}
+
+	pngs, svgs := 0, 0
+	for _, svc := range got.Services {
+		for _, f := range svc.Files {
+			if f.State != "in_repo" {
+				continue
+			}
+			if strings.HasSuffix(f.Path, ".svg") {
+				svgs++
+				// Carried but unverified, and unmeasurable by design: the
+				// viewBox is deliberately not parsed, so this stays null rather
+				// than being reported as a badly shaped mark.
+				if f.Shape != nil {
+					t.Errorf("%s: an svg has no raster header to read, got %+v", f.Path, f.Shape)
+				}
+				continue
+			}
+			pngs++
+			if f.Check != nil {
+				t.Errorf("%s: no store means no check, got %+v", f.Path, f.Check)
+			}
+			if f.Shape == nil {
+				t.Fatalf("%s: a present PNG must carry its measurement even with no store", f.Path)
+			}
+			if f.Shape.Width <= 0 || f.Shape.Height <= 0 {
+				t.Errorf("%s: shape = %+v", f.Path, f.Shape)
+			}
+			// Every mark in the repo is square today, so the note is empty and
+			// tile_safe is true. If that ever stops being so, the catalog test
+			// says which file and why.
+			if !f.Shape.TileSafe || f.Shape.Note != "" {
+				t.Errorf("%s: %+v — every published mark should survive a square tile", f.Path, f.Shape)
+			}
+		}
+	}
+	if pngs == 0 || svgs == 0 {
+		t.Fatalf("expected both PNGs and a carried SVG in the embed, got %d/%d — this test is asserting nothing", pngs, svgs)
+	}
+}
