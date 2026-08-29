@@ -66,7 +66,13 @@ raises a front-page alert when the answer is a login redirect.
 3. `go run ./cmd/placard gen .` — rasterizes svg-sourced PNGs and writes the
    `-dev.png` siblings.
 4. Commit everything. CI regenerates and fails the build if the generated
-   files drift from their sources.
+   files drift from their sources, **and if a mark is not roughly square** —
+   width ÷ height must land between 0.8 and 1.25. Cloudflare's App Launcher
+   tile is square and *fills* rather than fits, so a wide mark is cropped to
+   its centre there while looking perfectly fine on Placard's own page, which
+   fits (that is exactly how argosy's 2.28:1 glyph shipped). Square the source
+   — pad the SVG viewBox to 1:1 rather than cropping tight — rather than the
+   generated PNGs. `placard check` reports the same thing without failing.
 
 ## The service
 
