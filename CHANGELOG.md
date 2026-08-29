@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/Einlanzerous/placard/compare/v0.3.1...v0.4.0) (2026-08-29)
+
+
+### Features
+
+* **shape:** report a mark a square launcher tile will crop (PRSR-44) ([#8](https://github.com/Einlanzerous/placard/issues/8)) ([5dad835](https://github.com/Einlanzerous/placard/commit/5dad835f2a4b8682bf4ab5ef024c8e6a31f63cd3))
+
 ## [0.3.1](https://github.com/Einlanzerous/placard/compare/v0.3.0...v0.3.1) (2026-08-28)
 
 
