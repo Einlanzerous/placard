@@ -63,6 +63,14 @@ Tracked in Switchyard under the **PCAD** project (epic `PCAD-1`).
   known offline, on a PR, before jsDelivr has heard of the commit. Filing it
   under `check` would have made it null on exactly the deployment that has
   published a mark and never verified it.
+  **A report is keyed on the file a human edits, not on the file affected.**
+  `File.Source` is what `placard gen` would derive a file from — a per-variant
+  SVG, the shared one, or the mark PNG itself — and `Entry.ShapeFindings()`
+  groups on it. One badly shaped glyph in a `raster_from_svg` service produces
+  four bad PNGs (two marks, two `-dev` siblings), and reporting four findings
+  both overstates the problem and names generated files, whose only correct fix
+  is elsewhere. A service that commits its PNGs directly still reports twice
+  when both are wrong, which is right: those are two files to edit.
   **The carried SVG is deliberately not measured.** For a `raster_from_svg`
   service the PNG's aspect follows the viewBox, so measuring the PNG already
   catches a badly shaped source and names the file a human edits; a second

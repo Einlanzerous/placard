@@ -54,17 +54,26 @@ func runCheck() error {
 	// check above has failed. That is the point of measuring the committed
 	// bytes rather than a fetch: the answer is available on a PR, before
 	// jsDelivr has heard of the commit.
+	// One line per file a human would edit, not per file affected. A
+	// raster_from_svg service whose glyph is 3:1 produces four bad PNGs — two
+	// marks and their two -dev siblings — from one SVG, and reporting four
+	// findings would overstate the estate's problem and point twice at
+	// generated files that must never be hand-edited.
 	cropped := 0
 	for _, e := range entries {
-		for _, f := range e.OffShape() {
+		for _, f := range e.ShapeFindings() {
 			cropped++
-			fmt.Fprintf(w, "note\tshape\t%s\t%s\n", f.Path, f.Shape.Note())
+			detail := f.Shape.Note()
+			if n := len(f.Files); n > 1 {
+				detail += fmt.Sprintf(" (%d files derive from this one)", n)
+			}
+			fmt.Fprintf(w, "note\tshape\t%s\t%s\n", f.Source, detail)
 		}
 	}
 	w.Flush()
 
 	if cropped > 0 {
-		fmt.Printf("%d mark(s) will be cropped by a square launcher tile — reported, not failed\n", cropped)
+		fmt.Printf("%d mark source(s) will be cropped by a square launcher tile — reported, not failed\n", cropped)
 	}
 
 	if cfg.DatabaseURL != "" {

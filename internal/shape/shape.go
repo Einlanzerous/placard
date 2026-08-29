@@ -88,9 +88,15 @@ const (
 const sniffLimit = 64 << 10
 
 // Shape is a mark's pixel dimensions, zero when they could not be read.
+//
+// Deliberately untagged: nothing marshals this. The HTTP surface builds its own
+// wire shape, which adds the aspect and the verdict and — the reason a tag here
+// would be actively wrong — serves null for an unmeasured mark, where a tagged
+// Shape would serialize {"width":0,"height":0} and read as a measurement of
+// zero rather than as the absence of one.
 type Shape struct {
-	W int `json:"width"`
-	H int `json:"height"`
+	W int
+	H int
 }
 
 // Measure reads dimensions from the front of an image.
