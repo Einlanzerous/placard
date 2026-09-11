@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 go build -trimpath \
 
 # 2) Runtime: slim Alpine with ca-certificates (HTTPS to jsDelivr for the
 #    canonical-URL checks) and busybox wget for the compose healthcheck.
-FROM alpine:3.20 AS runtime
+FROM alpine:3.23 AS runtime
 RUN apk add --no-cache ca-certificates
 COPY --from=build /out/placard /usr/local/bin/placard
 ENV PLACARD_ADDR=":4009"
