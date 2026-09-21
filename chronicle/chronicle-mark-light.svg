@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- The Chronicle mark for LIGHT surfaces (CHRN-115) — the canvas's
+       "INVERTED · PRINT + LIGHT / APP ICON · SQUARE, NO PAD" tile: the same
+       glyph as chronicle-mark.svg, ink on a vellum plate instead of vellum on a
+       dark one. Cloudflare's App Launcher is a light surface, so this is the file
+       Purser resolves for Chronicle's Access tile (PRSR-37).
+
+       Geometry is identical to chronicle-mark.svg; change one and change both.
+       `placard gen` rasters this file into chronicle-mark-light.png. Ink is the
+       canvas's #14151a, vellum is Chronicle's signal token. -->
+  <rect width="512" height="512" fill="#e0d5be"/>
+  <g fill="#14151a">
+    <rect x="100" y="104" width="312"    height="16"/>
+    <rect x="100" y="160" width="274.56" height="16"/>
+    <rect x="168" y="240" width="16" height="32"/>
+    <rect x="200" y="222" width="16" height="68"/>
+    <rect x="232" y="234" width="16" height="44"/>
+    <rect x="264" y="216" width="16" height="80"/>
+    <rect x="296" y="232" width="16" height="48"/>
+    <rect x="328" y="244" width="16" height="24"/>
+    <rect x="100" y="336" width="224.64" height="16"/>
+    <rect x="100" y="392" width="293.28" height="16"/>
+  </g>
+</svg>

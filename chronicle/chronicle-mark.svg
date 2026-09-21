@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- The Chronicle mark for DARK surfaces (CHRN-115): mark 2a, "the interrupted
+       rule" — two ruled lines, a waveform cutting across the middle, two more
+       ruled lines below. Writing with speech landing inside it. Chronicle.dc.html,
+       pass 02 · identity.
+
+       This is the canvas's six-bar glyph (the wordmark / APP ICON size) at 4x, not
+       the five-bar one it draws at 11 and 22 px. The plate is full-bleed and square
+       ("APP ICON · SQUARE, NO PAD"): Cloudflare's App Launcher tile fills rather
+       than fits, so there is no transparent margin to crop. Corners are square on
+       purpose — the tile applies its own.
+
+       Plate is Chronicle's base surface and the glyph its signal, vellum; both are
+       tokens in Chronicle's web/src/styles/tokens.css. chronicle-mark-light.svg is
+       the same geometry inverted, and drives the light PNGs. Nothing here uses
+       CSS or rx: the generator's rasterizer (oksvg) reads plain fills only. -->
+  <rect width="512" height="512" fill="#08090a"/>
+  <g fill="#e0d5be">
+    <rect x="100" y="104" width="312"    height="16"/>
+    <rect x="100" y="160" width="274.56" height="16"/>
+    <rect x="168" y="240" width="16" height="32"/>
+    <rect x="200" y="222" width="16" height="68"/>
+    <rect x="232" y="234" width="16" height="44"/>
+    <rect x="264" y="216" width="16" height="80"/>
+    <rect x="296" y="232" width="16" height="48"/>
+    <rect x="328" y="244" width="16" height="24"/>
+    <rect x="100" y="336" width="224.64" height="16"/>
+    <rect x="100" y="392" width="293.28" height="16"/>
+  </g>
+</svg>

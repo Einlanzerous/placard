@@ -23,6 +23,14 @@
       "legacy_source": "switchyard@main/client/src/assets/sy_mark.svg (private)"
     },
     {
+      "slug": "chronicle",
+      "name": "Chronicle",
+      "color": "#e0d5be",
+      "raster_from_svg": true,
+      "note": "Mark 2a, the interrupted rule (CHRN-115): two ruled lines, a waveform across the middle, two more rules. Until this row Placard had no slug for Chronicle, Purser reported its Access application as `adopt` with a note, and the App Launcher showed two initials. Authored per variant: the dark plate carries a vellum glyph, the light plate an ink one, both full-bleed and square because the launcher tile fills rather than fits. The light mark is the one Purser resolves.",
+      "legacy_source": "none — chronicle@main/web/src/components/Mark.vue draws the same glyph at 22px; Chronicle.dc.html pass 02 is the design"
+    },
+    {
       "slug": "wiki",
       "name": "Wiki",
       "note": "No logo_url set on the Access application; renders as two grey initials.",
