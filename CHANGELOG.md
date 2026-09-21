@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/Einlanzerous/placard/compare/v0.4.0...v0.5.0) (2026-09-21)
+
+
+### Features
+
+* **chronicle:** add Chronicle's mark — 2a, the interrupted rule, dark and light (CHRN-115) ([#12](https://github.com/Einlanzerous/placard/issues/12)) ([9c4417b](https://github.com/Einlanzerous/placard/commit/9c4417b97cc0fd9f358d1b0af597a4d26d086d4b))
+
+
+### Bug Fixes
+
+* **deploy:** build the runtime on alpine 3.23, not the EOL 3.20 (SERV-170) ([#10](https://github.com/Einlanzerous/placard/issues/10)) ([d7ddf43](https://github.com/Einlanzerous/placard/commit/d7ddf43bd378b99c1e55ca41f179736d951008ed))
+
 ## [0.4.0](https://github.com/Einlanzerous/placard/compare/v0.3.1...v0.4.0) (2026-08-29)
 
 
