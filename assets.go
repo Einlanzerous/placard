@@ -11,5 +11,5 @@ package placard
 import "embed"
 
 //go:embed services.json
-//go:embed all:argosy all:switchyard all:lyceum all:placard all:chronicle
+//go:embed all:argosy all:switchyard all:lyceum all:placard all:chronicle all:catenary
 var Assets embed.FS
