@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/Einlanzerous/placard/compare/v0.5.0...v0.6.0) (2026-10-07)
+
+
+### Features
+
+* **catenary:** add Catenary's mark — form 1C, the span, dark and light (CANT-239) ([#13](https://github.com/Einlanzerous/placard/issues/13)) ([b9c7e72](https://github.com/Einlanzerous/placard/commit/b9c7e723235bdfd0e5e3f16a7a9901b239975056))
+
 ## [0.5.0](https://github.com/Einlanzerous/placard/compare/v0.4.0...v0.5.0) (2026-09-21)
 
 
