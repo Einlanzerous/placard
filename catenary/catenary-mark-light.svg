@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="512" height="512">
+  <!-- The Catenary mark for LIGHT surfaces — the same span as
+       catenary-mark.svg in the light theme's tokens: on light grounds
+       `accent-mark` darkens so the cutout stays visible, and the cut is drawn
+       in the light `surface-base` it would reveal. Cloudflare's App Launcher
+       is a light surface, so this is the file Purser resolves for Catenary's
+       Access tile (PRSR-37).
+
+       Geometry is identical to catenary-mark.svg; change one and change both.
+       `placard gen` rasters this file into catenary-mark-light.png. -->
+  <rect width="48" height="48" fill="#c4761f"/>
+  <g fill="#f7f6f3">
+    <rect x="10" y="12" width="3.4" height="28"/>
+    <rect x="34.6" y="12" width="3.4" height="28"/>
+    <rect x="5" y="31" width="38" height="2.4"/>
+  </g>
+  <path fill="#f7f6f3" d="M13.06 13.94 Q24 24.88 34.94 13.94 L37.06 16.06 Q24 29.12 10.94 16.06 Z"/>
+</svg>

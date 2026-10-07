@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="512" height="512">
+  <!-- The Catenary mark for DARK surfaces: canvas section 07, form 1C "Span" —
+       two masts, a deck, and the messenger wire sagging between them, the
+       catenary curve the product is named for. Same geometry, on the same 48
+       grid, as catenary@main/web/src/components/Logomark.vue and
+       web/public/favicon.svg; change it there and change it here.
+
+       In Catenary the span is KNOCKED OUT of the tile with a mask, so the
+       surface shows through. The generator's rasterizer (oksvg) reads plain
+       fills only, no masks — so the cut is drawn here in the
+       surface it would reveal: Catenary's dark `surface-base`, on its dark
+       `accent-mark` tile. Both are tokens in web/src/styles/tokens.css.
+
+       The wire is Catenary's `M12 15 Q24 27 36 15` at stroke-width 3, written
+       as the FILLED outline of that stroke: the rasterizer does not scale a
+       stroke width with the viewBox, so a stroked wire renders hairline at
+       512px. The two curves are the stroke's edges, 1.5 either side.
+
+       Full-bleed and square, corners square on purpose: Cloudflare's App
+       Launcher tile fills rather than fits and applies its own corners.
+       catenary-mark-light.svg is the light theme's pair of the same tokens
+       and drives the light PNGs. -->
+  <rect width="48" height="48" fill="#e5a03c"/>
+  <g fill="#0b0d0e">
+    <rect x="10" y="12" width="3.4" height="28"/>
+    <rect x="34.6" y="12" width="3.4" height="28"/>
+    <rect x="5" y="31" width="38" height="2.4"/>
+  </g>
+  <path fill="#0b0d0e" d="M13.06 13.94 Q24 24.88 34.94 13.94 L37.06 16.06 Q24 29.12 10.94 16.06 Z"/>
+</svg>

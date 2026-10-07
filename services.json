@@ -31,6 +31,13 @@
       "legacy_source": "none — chronicle@main/web/src/components/Mark.vue draws the same glyph at 22px; Chronicle.dc.html pass 02 is the design"
     },
     {
+      "slug": "catenary",
+      "name": "Catenary",
+      "raster_from_svg": true,
+      "note": "Form 1C, the span: two masts, a deck and the messenger wire's sag, cut out of a solid tile. Until this row Placard had no slug for Catenary, so Purser had nothing to resolve and the App Launcher showed two initials. Authored per variant in Catenary's own theme tokens — the dark tile is its dark accent-mark, the light tile the darker light-theme one — with the cutout drawn in the surface it reveals, because the generator's rasterizer has no masks. Full-bleed and square. The light mark is the one Purser resolves.",
+      "legacy_source": "none — catenary@main/web/src/components/Logomark.vue and web/public/favicon.svg draw the same geometry"
+    },
+    {
       "slug": "wiki",
       "name": "Wiki",
       "note": "No logo_url set on the Access application; renders as two grey initials.",
