@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Placard — system map",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "https://github.com/Einlanzerous/placard",
+      "revision": "b55263a5abb0b56767728951572f0d3c0b1f36bc"
+    },
+    "views": [
+      {
+        "id": "icon-path",
+        "label": "An icon fetch",
+        "focus": [
+          "repo",
+          "jsdelivr",
+          "launcher"
+        ],
+        "note": "The public repo is the source of every mark; jsDelivr serves the canonical URL the launcher is given."
+      },
+      {
+        "id": "public-serving",
+        "label": "Sessionless serving",
+        "focus": [
+          "launcher",
+          "purser",
+          "edge",
+          "api",
+          "embed"
+        ],
+        "note": "No Access application covers the host, by design: every asset URL must fetch with no session."
+      },
+      {
+        "id": "verification",
+        "label": "Verification",
+        "focus": [
+          "checker",
+          "jsdelivr",
+          "edge",
+          "postgres"
+        ],
+        "note": "Placard fetches its own canonical URLs and its own public edge as the sessionless world would, and records the result."
+      }
+    ],
+    "viewBox": [
+      1190,
+      560
+    ]
+  },
+  "components": [
+    {
+      "id": "repo",
+      "type": "cloud",
+      "label": "Public GitHub repo",
+      "sublabel": "source of truth for every mark",
+      "pos": [
+        40,
+        170
+      ],
+      "size": [
+        170,
+        64
+      ],
+      "sources": [
+        {
+          "path": "services.json",
+          "line": 1,
+          "label": "manifest"
+        },
+        {
+          "path": "README.md",
+          "line": 12,
+          "end_line": 21,
+          "label": "mark file contract"
+        }
+      ]
+    },
+    {
+      "id": "gen",
+      "type": "backend",
+      "label": "placard gen",
+      "sublabel": "deterministic -dev.png + SVG raster",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        170,
+        64
+      ],
+      "sources": [
+        {
+          "path": "internal/gen/gen.go",
+          "line": 26,
+          "label": "gen.Run"
+        },
+        {
+          "path": "cmd/placard/main.go",
+          "line": 14,
+          "label": "subcommands"
+        },
+        {
+          "path": ".github/workflows/backend.yml",
+          "line": 66,
+          "end_line": 77,
+          "label": "CI drift check"
+        }
+      ]
+    },
+    {
+      "id": "jsdelivr",
+      "type": "external",
+      "label": "jsDelivr CDN",
+      "sublabel": "canonical URLs",
+      "pos": [
+        280,
+        170
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "launcher",
+      "type": "external",
+      "label": "Access launcher",
+      "sublabel": "icon tiles, prod and dev",
+      "pos": [
+        520,
+        30
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "purser",
+      "type": "external",
+      "label": "Purser connector",
+      "sublabel": "reads /api/services",
+      "pos": [
+        520,
+        120
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "edge",
+      "type": "security",
+      "label": "Public edge",
+      "sublabel": "no Access application",
+      "tag": "sessionless by design",
+      "pos": [
+        760,
+        118
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "docs/deploy.md",
+          "line": 7,
+          "label": "why it is ungated"
+        },
+        {
+          "path": "README.md",
+          "line": 38,
+          "end_line": 56,
+          "label": "the one constraint"
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "placard serve",
+      "sublabel": "Go HTTP :4009",
+      "tag": "uploads token-gated",
+      "pos": [
+        1000,
+        120
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "internal/api/server.go",
+          "line": 40,
+          "end_line": 56,
+          "label": "routes"
+        },
+        {
+          "path": "internal/api/services.go",
+          "line": 145,
+          "label": "GET /api/services"
+        },
+        {
+          "path": "cmd/placard/serve.go",
+          "line": 20,
+          "label": "runServe"
+        }
+      ]
+    },
+    {
+      "id": "frontpage",
+      "type": "frontend",
+      "label": "Front page",
+      "sublabel": "designed page, embedded",
+      "pos": [
+        1000,
+        20
+      ],
+      "size": [
+        150,
+        60
+      ],
+      "sources": [
+        {
+          "path": "internal/api/web/index.html",
+          "line": 231,
+          "label": "fetches /api/services"
+        },
+        {
+          "path": "internal/api/server.go",
+          "line": 29,
+          "end_line": 30,
+          "label": "go:embed"
+        }
+      ]
+    },
+    {
+      "id": "embed",
+      "type": "backend",
+      "label": "Embedded marks",
+      "sublabel": "mirror + catalog",
+      "pos": [
+        1000,
+        240
+      ],
+      "size": [
+        150,
+        60
+      ],
+      "sources": [
+        {
+          "path": "assets.go",
+          "line": 13,
+          "end_line": 15,
+          "label": "embedded asset tree"
+        },
+        {
+          "path": "internal/catalog/catalog.go",
+          "line": 53,
+          "label": "catalog.Build"
+        },
+        {
+          "path": "internal/api/server.go",
+          "line": 93,
+          "end_line": 115,
+          "label": "mirror handler"
+        }
+      ]
+    },
+    {
+      "id": "checker",
+      "type": "backend",
+      "label": "URL checker",
+      "sublabel": "canonical + edge passes",
+      "pos": [
+        520,
+        260
+      ],
+      "size": [
+        150,
+        60
+      ],
+      "sources": [
+        {
+          "path": "internal/checker/checker.go",
+          "line": 45,
+          "end_line": 87,
+          "label": "CheckAll, CheckEdge"
+        },
+        {
+          "path": "cmd/placard/serve.go",
+          "line": 75,
+          "end_line": 87,
+          "label": "checkLoop"
+        }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "Postgres",
+      "sublabel": "checks + staged uploads",
+      "tag": "optional",
+      "pos": [
+        760,
+        260
+      ],
+      "size": [
+        150,
+        60
+      ],
+      "sources": [
+        {
+          "path": "migrations/0001_init.up.sql",
+          "line": 6,
+          "end_line": 36,
+          "label": "mark_check, staged_upload"
+        },
+        {
+          "path": "migrations/0002_check_kind.up.sql",
+          "label": "check kind"
+        },
+        {
+          "path": "internal/store/store.go",
+          "line": 41,
+          "label": "boot migrator"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "repo-jsdelivr",
+      "from": "repo",
+      "to": "jsdelivr",
+      "label": "serves @main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "jsdelivr-launcher",
+      "from": "jsdelivr",
+      "to": "launcher",
+      "label": "canonical icon URL",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gen-repo",
+      "from": "gen",
+      "to": "repo",
+      "label": "commits",
+      "variant": "dashed",
+      "labelAt": [
+        125,
+        137
+      ]
+    },
+    {
+      "id": "repo-embed",
+      "from": "repo",
+      "to": "embed",
+      "label": "go:embed at build",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          125,
+          390
+        ],
+        [
+          1075,
+          390
+        ]
+      ]
+    },
+    {
+      "id": "launcher-edge",
+      "from": "launcher",
+      "to": "edge",
+      "label": "mirror",
+      "variant": "security",
+      "toSide": "top"
+    },
+    {
+      "id": "purser-edge",
+      "from": "purser",
+      "to": "edge",
+      "label": "/api/services",
+      "variant": "security"
+    },
+    {
+      "id": "edge-api",
+      "from": "edge",
+      "to": "api",
+      "label": "plain HTTP"
+    },
+    {
+      "id": "api-frontpage",
+      "from": "api",
+      "to": "frontpage",
+      "label": "serves"
+    },
+    {
+      "id": "api-embed",
+      "from": "api",
+      "to": "embed",
+      "label": "marks",
+      "labelAt": [
+        1075,
+        212
+      ]
+    },
+    {
+      "id": "api-postgres",
+      "from": "api",
+      "to": "postgres",
+      "label": "staged uploads"
+    },
+    {
+      "id": "checker-jsdelivr",
+      "from": "checker",
+      "to": "jsdelivr",
+      "label": "verify URLs",
+      "variant": "dashed"
+    },
+    {
+      "id": "checker-edge",
+      "from": "checker",
+      "to": "edge",
+      "label": "self-check",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "checker-postgres",
+      "from": "checker",
+      "to": "postgres",
+      "label": "records"
+    }
+  ]
+}

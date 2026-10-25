@@ -72,6 +72,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Checks that docs/architecture.archify.json still renders: every cited
+      # path and line exists at the pinned commit. A stale pin only warns; a
+      # broken path or line fails. Runs on every PR and push to main, with no
+      # path filter, so drift is always reported.
+      - name: Architecture map is renderable, and say if it has gone stale (SERV-159)
+        run: scripts/architecture-map-check.sh
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
