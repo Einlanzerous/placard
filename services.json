@@ -63,6 +63,13 @@
       "raster_from_svg": true,
       "note": "This service: the front page you are reading, and the mirror of every mark in this repo.",
       "legacy_source": "none — born here"
+    },
+    {
+      "slug": "satlink",
+      "name": "Satlink",
+      "raster_from_svg": true,
+      "note": "The estate health dashboard. One mark for both surfaces: a dark rounded square holding a tilted orbit with a red centre dot.",
+      "legacy_source": "none"
     }
   ]
 }
