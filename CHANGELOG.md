@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/Einlanzerous/placard/compare/v0.6.0...v0.7.0) (2026-11-15)
+
+
+### Features
+
+* **satlink:** add the Satlink service mark (SATL-67) ([#16](https://github.com/Einlanzerous/placard/issues/16)) ([3f9276f](https://github.com/Einlanzerous/placard/commit/3f9276f0ddb7a73bf271ce5d6aa6979ea0711bb6))
+
 ## [0.6.0](https://github.com/Einlanzerous/placard/compare/v0.5.0...v0.6.0) (2026-10-07)
 
 
