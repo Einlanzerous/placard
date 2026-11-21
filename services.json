@@ -57,6 +57,13 @@
       "legacy_source": "none"
     },
     {
+      "slug": "commonplace",
+      "name": "Commonplace",
+      "raster_from_svg": true,
+      "note": "The family recipe book (cook_book repo). Mark is the chef's-hat glyph from the app's own favicon (frontend/public/favicon.svg, COOK-40), in the project green #4E8A6A, which reads on both light and dark tiles. Squared by construction: the 24x24 viewBox is 1:1.",
+      "legacy_source": "cook_book@main/frontend/public/favicon.svg"
+    },
+    {
       "slug": "placard",
       "name": "Placard",
       "color": "#b8ff2e",
