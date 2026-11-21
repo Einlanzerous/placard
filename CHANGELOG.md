@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/Einlanzerous/placard/compare/v0.7.0...v0.8.0) (2026-11-21)
+
+
+### Features
+
+* **commonplace:** add Commonplace's chef's-hat mark to the asset store (COOK-66) ([#18](https://github.com/Einlanzerous/placard/issues/18)) ([1ef5f93](https://github.com/Einlanzerous/placard/commit/1ef5f933b8fc596ef81743afc0b4b799135bae0f))
+* **genzo:** add Genzo's mark to the asset store (GENZO-98) ([#19](https://github.com/Einlanzerous/placard/issues/19)) ([3f98656](https://github.com/Einlanzerous/placard/commit/3f9865686442a64085ece14d049640d2cd787742))
+
 ## [0.7.0](https://github.com/Einlanzerous/placard/compare/v0.6.0...v0.7.0) (2026-11-15)
 
 
