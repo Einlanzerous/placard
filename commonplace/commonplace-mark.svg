@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- The Commonplace mark: the chef's-hat glyph from cook_book's own favicon
+       (cook_book@main/frontend/public/favicon.svg, 24-unit grid, stroke 2,
+       round caps and joins, #4E8A6A). Change it there and change it here.
+
+       Redrawn on a 512 grid (every coordinate x 21.333) because the
+       generator's rasterizer does not scale a stroke width with the viewBox
+       (see catenary-mark.svg), and the arcs are flattened to short segments
+       (the rasterizer's arc handling is not trusted for these). The
+       stroke stays a stroke (width 2 x 21.333 = 42.67); round joins and caps
+       keep it matching the favicon. One mid-tone green reads on both light
+       and dark tiles, so this one SVG drives both variants. 1:1 by
+       construction, with padding, so a square launcher tile shows it whole. -->
+  <path fill="none" stroke="#4E8A6A" stroke-width="42.67" stroke-linecap="round" stroke-linejoin="round" d="M128.00,295.89 L117.49,292.92 L107.45,288.63 L98.04,283.10 L89.41,276.41 L81.71,268.67 L75.06,260.01 L69.56,250.57 L65.32,240.51 L62.40,229.99 L60.85,219.18 L60.69,208.26 L61.92,197.41 L64.53,186.81 L68.47,176.63 L73.68,167.03 L80.07,158.18 L87.54,150.22 L95.97,143.27 L105.21,137.46 L115.13,132.88 L125.54,129.60 L136.29,127.67 L147.19,127.14 L158.08,128.00 L158.76,126.48 L159.47,124.97 L160.20,123.47 L160.95,121.99 L161.73,120.51 L162.52,119.05 L163.34,117.60 L164.19,116.16 L165.05,114.74 L165.93,113.32 L166.84,111.93 L167.77,110.54 L168.72,109.17 L169.69,107.82 L170.68,106.48 L171.69,105.16 L172.72,103.85 L173.77,102.55 L174.84,101.28 L175.93,100.02 L177.04,98.77 L178.17,97.55 L179.32,96.34 L180.48,95.15 L185.58,90.36 L190.98,85.92 L196.66,81.84 L202.59,78.14 L208.75,74.84 L215.12,71.95 L221.66,69.49 L228.35,67.46 L235.16,65.87 L242.05,64.72 L249.01,64.04 L256.00,63.81 L262.99,64.04 L269.95,64.72 L276.84,65.87 L283.65,67.46 L290.34,69.49 L296.88,71.95 L303.25,74.84 L309.41,78.14 L315.34,81.84 L321.02,85.92 L326.42,90.36 L331.52,95.15 L332.68,96.34 L333.83,97.55 L334.96,98.77 L336.07,100.02 L337.16,101.28 L338.23,102.55 L339.28,103.85 L340.31,105.16 L341.32,106.48 L342.31,107.82 L343.28,109.17 L344.23,110.54 L345.16,111.93 L346.07,113.32 L346.95,114.74 L347.81,116.16 L348.66,117.60 L349.48,119.05 L350.27,120.51 L351.05,121.99 L351.80,123.47 L352.53,124.97 L353.24,126.48 L353.92,128.00 L364.81,127.14 L375.71,127.67 L386.46,129.60 L396.87,132.88 L406.79,137.46 L416.03,143.27 L424.46,150.22 L431.93,158.18 L438.32,167.03 L443.53,176.63 L447.47,186.81 L450.08,197.41 L451.31,208.26 L451.15,219.18 L449.60,229.99 L446.68,240.51 L442.44,250.57 L436.94,260.01 L430.29,268.67 L422.59,276.41 L413.96,283.10 L404.55,288.63 L394.51,292.92 L384.00,295.89 L384.00,448.00 L128.00,448.00 L128.00,295.89 Z"/>
+  <path fill="none" stroke="#4E8A6A" stroke-width="42.67" stroke-linecap="round" stroke-linejoin="round" d="M128,362.67 L384,362.67"/>
+</svg>
