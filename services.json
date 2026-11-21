@@ -77,6 +77,13 @@
       "raster_from_svg": true,
       "note": "The estate health dashboard. One mark for both surfaces: a dark rounded square holding a tilted orbit with a red centre dot.",
       "legacy_source": "none"
+    },
+    {
+      "slug": "genzo",
+      "name": "Genzo",
+      "raster_from_svg": true,
+      "note": "The self-hosted photo library (GENZO-98). Mark is Genzo's own favicon (web/public/favicon.svg in the genzo repo), a dark rounded square holding an amber ring, one mark for both surfaces. The ring is the favicon's stroked circle redrawn as two filled circles (same geometry, same colours) because the generator's rasterizer draws strokes as hairlines. Square by construction: the 32x32 viewBox is 1:1.",
+      "legacy_source": "genzo@main/web/public/favicon.svg"
     }
   ]
 }
